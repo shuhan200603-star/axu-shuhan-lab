@@ -1,0 +1,26 @@
+{
+  "name": "阿序和书函的实验室",
+  "short_name": "小小实验室",
+  "description": "收藏灵感、记录发现，也认真对待每一个小小的想法。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f0ea",
+  "theme_color": "#f5f0ea",
+  "icons": [
+    {
+      "src": "icons/lab-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/lab-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

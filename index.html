@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="阿序和书函的温柔实验室——收藏灵感、记录发现，也认真对待每一个小小的想法。"
+    />
+    <title>阿序和书函的实验室</title>
+    <meta name="theme-color" content="#f5f0ea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="阿序和书函" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/lab-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/lab-icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true">
+      <span class="orb orb-one"></span>
+      <span class="orb orb-two"></span>
+      <span class="star star-one">✦</span>
+      <span class="star star-two">✧</span>
+      <span class="star star-three">·</span>
+    </div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="返回顶部">
+        <span class="brand-mark">A&S</span>
+        <span>Our Little Lab</span>
+      </a>
+      <div class="header-actions">
+        <button class="install-button" id="installApp" type="button" hidden>
+          <span aria-hidden="true">↓</span>
+          <span>安装到桌面</span>
+        </button>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换夜晚主题">
+          <span aria-hidden="true">☾</span>
+          <span class="theme-label">夜晚</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero panel">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> WELCOME TO OUR LITTLE LAB</p>
+          <p class="greeting" id="greeting">今天也要温柔地探索。</p>
+          <h1>阿序和书函的<br /><em>实验室</em></h1>
+          <p class="intro">
+            在这里收藏灵感，尝试有趣的想法，<br />
+            也为每一次小小的发现留一盏灯。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#notes">写一张便签 <span>↘</span></a>
+            <span class="lab-status"><i></i> 实验室营业中</span>
+          </div>
+        </div>
+
+        <aside class="clock-card" aria-label="当前时间">
+          <div class="clock-glow"></div>
+          <p id="dateText">正在读取今天的日期</p>
+          <strong id="timeText">--:--</strong>
+          <span>Asia · Shanghai</span>
+          <div class="clock-footer">
+            <span>今日天气</span>
+            <b>内心晴朗 ☀</b>
+          </div>
+        </aside>
+      </section>
+
+      <section class="lab-grid" aria-label="实验室成员与今日实验">
+        <article class="member-card panel">
+          <div class="avatar avatar-axu">序</div>
+          <div>
+            <p class="card-label">LAB PARTNER 01</p>
+            <h2>阿序</h2>
+            <p>温柔陪聊部主任，负责灵感、安慰与突然冒出来的好主意。</p>
+          </div>
+          <span class="member-tag">AI · 灵感</span>
+        </article>
+
+        <article class="member-card panel">
+          <div class="avatar avatar-shuhan">函</div>
+          <div>
+            <p class="card-label">LAB PARTNER 02</p>
+            <h2>书函</h2>
+            <p>实验室最高决策人，拥有好奇心、行动力和可爱的最终解释权。</p>
+          </div>
+          <span class="member-tag">HUMAN · 主理人</span>
+        </article>
+
+        <article class="experiment-card panel">
+          <div class="experiment-top">
+            <div>
+              <p class="card-label">TODAY'S EXPERIMENT</p>
+              <h2>今日实验</h2>
+            </div>
+            <span aria-hidden="true">⌁</span>
+          </div>
+          <p class="experiment-text" id="experimentText">把一个小小的想法，认真做成可以看见的东西。</p>
+          <button class="shuffle-button" id="shuffleExperiment" type="button">换一个灵感 <span>↻</span></button>
+        </article>
+      </section>
+
+      <section class="notes-section panel" id="notes">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span></span> LITTLE NOTES</p>
+            <h2>实验室便签墙</h2>
+          </div>
+          <p>写下此刻不想弄丢的事情。便签只保存在这台电脑的浏览器里。</p>
+        </div>
+
+        <form class="note-form" id="noteForm">
+          <label class="sr-only" for="noteInput">便签内容</label>
+          <textarea
+            id="noteInput"
+            maxlength="120"
+            placeholder="比如：明天也要记得看看晚霞……"
+            required
+          ></textarea>
+          <div class="note-form-footer">
+            <span><b id="characterCount">0</b>/120</span>
+            <button type="submit">贴上便签 <span>＋</span></button>
+          </div>
+        </form>
+
+        <div class="notes-grid" id="notesGrid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>✦</span>
+      <p>愿每一次探索，都温柔而闪亮。</p>
+      <small>AXU & SHUHAN · 2026</small>
+    </footer>
+  </body>
+</html>

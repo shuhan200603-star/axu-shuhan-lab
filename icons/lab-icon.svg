@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">阿序和书函的实验室</title>
+  <desc id="desc">柔粉与鼠尾草绿组成的实验室烧瓶图标</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3d6cf"/>
+      <stop offset="1" stop-color="#d7e4dc"/>
+    </linearGradient>
+    <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d99184"/>
+      <stop offset="1" stop-color="#bd766b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="28" stdDeviation="26" flood-color="#72574f" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="#fffaf5"/>
+  <circle cx="512" cy="500" r="380" fill="url(#bg)" opacity=".8"/>
+  <g filter="url(#shadow)">
+    <path d="M410 248h204v74h-34v166l151 237c32 51-4 117-64 117H357c-60 0-96-66-64-117l151-237V322h-34z" fill="#fffaf5" stroke="#514844" stroke-width="30" stroke-linejoin="round"/>
+    <path d="M359 690c78-49 151 44 231-5 35-22 67-25 102-10l51 80c19 30-3 69-39 69H320c-36 0-58-39-39-69z" fill="url(#liquid)"/>
+    <path d="M444 388h136" fill="none" stroke="#514844" stroke-width="24" stroke-linecap="round"/>
+    <circle cx="447" cy="628" r="25" fill="#fffaf5" opacity=".8"/>
+    <circle cx="532" cy="742" r="15" fill="#fffaf5" opacity=".72"/>
+    <circle cx="603" cy="624" r="12" fill="#fffaf5" opacity=".7"/>
+  </g>
+  <path d="m754 238 18 42 42 18-42 18-18 42-18-42-42-18 42-18z" fill="#cf877a"/>
+  <path d="m272 327 11 26 26 11-26 11-11 26-11-26-26-11 26-11z" fill="#789386"/>
+</svg>
