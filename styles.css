@@ -41,12 +41,14 @@ html {
 body {
   min-width: 320px;
   margin: 0;
+  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
   color: var(--text);
   background: var(--bg);
   transition: color 300ms ease, background 500ms ease;
 }
 
 button,
+input,
 textarea {
   font: inherit;
 }
@@ -462,6 +464,14 @@ h1 em {
   border-radius: 38px;
 }
 
+.app-view[hidden] {
+  display: none;
+}
+
+.app-view:not([hidden]) {
+  animation: view-in 280ms ease-out both;
+}
+
 .section-heading {
   display: flex;
   align-items: flex-end;
@@ -595,6 +605,334 @@ h1 em {
   font-size: 13px;
 }
 
+.diary-section {
+  margin-top: 24px;
+  padding: clamp(34px, 6vw, 68px);
+  border-radius: 38px;
+}
+
+.diary-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  margin-top: 36px;
+  gap: 22px;
+}
+
+.diary-editor,
+.diary-list-panel,
+.backup-card {
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface-solid);
+}
+
+.diary-editor {
+  padding: 22px;
+}
+
+.diary-date-row,
+.diary-form-footer,
+.subsection-heading,
+.backup-card,
+.backup-actions,
+.diary-actions {
+  display: flex;
+  align-items: center;
+}
+
+.diary-date-row {
+  justify-content: space-between;
+  padding-bottom: 16px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.diary-date-row input {
+  max-width: 170px;
+  padding: 9px 12px;
+  color: var(--text);
+  color-scheme: inherit;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: 0;
+  background: var(--surface);
+}
+
+.diary-editor textarea {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  padding: 24px 2px;
+  resize: vertical;
+  color: var(--text);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 15px;
+  line-height: 2;
+}
+
+.diary-editor textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.68;
+}
+
+.diary-form-footer {
+  justify-content: space-between;
+  padding-top: 14px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  font-family: Inter, "Microsoft YaHei", sans-serif;
+  font-size: 10px;
+}
+
+.diary-actions,
+.backup-actions {
+  gap: 10px;
+}
+
+.primary-action,
+.secondary-button {
+  min-height: 42px;
+  padding: 0 18px;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.primary-action {
+  color: var(--surface-solid);
+  border: 0;
+  background: var(--text);
+}
+
+.secondary-button {
+  color: var(--text);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.danger-button,
+.danger-outline {
+  color: #b05f55;
+  border-color: rgba(176, 95, 85, 0.28);
+}
+
+.diary-list-panel {
+  min-height: 460px;
+  padding: 22px;
+}
+
+.subsection-heading {
+  justify-content: space-between;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.subsection-heading h3,
+.backup-card h3 {
+  margin: 6px 0 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.subsection-heading > span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.diary-list {
+  display: grid;
+  margin-top: 14px;
+  gap: 10px;
+}
+
+.diary-list-item {
+  width: 100%;
+  padding: 15px;
+  cursor: pointer;
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: var(--surface);
+  text-align: left;
+}
+
+.diary-list-item.is-selected {
+  border-color: var(--rose);
+  background: var(--rose-soft);
+}
+
+.diary-list-item strong,
+.diary-list-item span {
+  display: block;
+}
+
+.diary-list-item strong {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.diary-list-item span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-diaries {
+  padding: 28px 8px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.backup-card {
+  position: relative;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding: 24px;
+  gap: 24px;
+}
+
+.backup-card > div:first-child {
+  max-width: 540px;
+}
+
+.backup-card p {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.backup-status {
+  position: absolute;
+  right: 24px;
+  bottom: 5px;
+}
+
+.bottom-nav {
+  position: fixed;
+  z-index: 20;
+  right: 50%;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: min(420px, calc(100% - 28px));
+  padding: 7px;
+  border-radius: 24px;
+  transform: translateX(50%);
+}
+
+.bottom-nav-item {
+  display: grid;
+  min-height: 58px;
+  padding: 7px 10px;
+  cursor: pointer;
+  color: var(--muted);
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  place-items: center;
+  gap: 1px;
+}
+
+.bottom-nav-item > span {
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.bottom-nav-item small {
+  font-size: 10px;
+}
+
+.bottom-nav-item.is-active {
+  color: var(--surface-solid);
+  background: var(--text);
+}
+
+.import-dialog {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  padding: 20px;
+  place-items: center;
+}
+
+.import-dialog[hidden] {
+  display: none;
+}
+
+.import-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 27, 25, 0.48);
+  backdrop-filter: blur(6px);
+}
+
+.import-dialog-card {
+  position: relative;
+  width: min(520px, 100%);
+  padding: 30px;
+  border-radius: 28px;
+}
+
+.import-dialog-card h2 {
+  margin: 18px 0 10px;
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.import-dialog-card > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.import-options {
+  display: grid;
+  margin-top: 22px;
+  gap: 10px;
+}
+
+.import-options .secondary-button {
+  height: auto;
+  padding: 16px 18px;
+  border-radius: 18px;
+  text-align: left;
+}
+
+.import-options strong,
+.import-options span {
+  display: block;
+}
+
+.import-options strong {
+  margin-bottom: 5px;
+}
+
+.import-options span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.dialog-cancel {
+  display: block;
+  margin: 18px auto 0;
+  padding: 8px 18px;
+  cursor: pointer;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+}
+
 footer {
   display: flex;
   align-items: center;
@@ -658,6 +996,10 @@ button:hover,
 
   .experiment-card {
     grid-column: 1 / -1;
+  }
+
+  .diary-layout {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -734,6 +1076,47 @@ button:hover,
     border-radius: 28px;
   }
 
+  .diary-section {
+    padding: 32px 20px;
+    border-radius: 28px;
+  }
+
+  .diary-editor,
+  .diary-list-panel {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .diary-editor textarea {
+    min-height: 280px;
+  }
+
+  .backup-card {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .backup-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .backup-status {
+    position: static;
+    grid-column: 1 / -1;
+  }
+
+  .import-dialog {
+    align-items: end;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .import-dialog-card {
+    padding: 26px 22px;
+    border-radius: 26px;
+  }
+
   .section-heading {
     align-items: flex-start;
     flex-direction: column;
@@ -782,5 +1165,17 @@ button:hover,
   50% {
     opacity: 0.7;
     transform: translateY(-8px) rotate(8deg);
+  }
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -45,6 +45,7 @@
     </header>
 
     <main id="top">
+      <section class="app-view" id="homeView" data-view="home">
       <section class="hero panel">
         <div class="hero-copy">
           <p class="eyebrow"><span></span> WELCOME TO OUR LITTLE LAB</p>
@@ -105,8 +106,9 @@
           <button class="shuffle-button" id="shuffleExperiment" type="button">换一个灵感 <span>↻</span></button>
         </article>
       </section>
+      </section>
 
-      <section class="notes-section panel" id="notes">
+      <section class="notes-section panel app-view" id="notes" data-view="notes" hidden>
         <div class="section-heading">
           <div>
             <p class="eyebrow"><span></span> LITTLE NOTES</p>
@@ -131,6 +133,64 @@
 
         <div class="notes-grid" id="notesGrid" aria-live="polite"></div>
       </section>
+
+      <section class="diary-section panel app-view" id="diary" data-view="diary" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span></span> LAB DIARY</p>
+            <h2>实验室日记</h2>
+          </div>
+          <p>把一天收进一页纸里。日记暂时只保存在当前浏览器中。</p>
+        </div>
+
+        <div class="diary-layout">
+          <form class="diary-editor" id="diaryForm">
+            <div class="diary-date-row">
+              <label for="diaryDate">日记日期</label>
+              <input id="diaryDate" name="date" type="date" required />
+            </div>
+            <label class="sr-only" for="diaryInput">日记内容</label>
+            <textarea
+              id="diaryInput"
+              maxlength="5000"
+              placeholder="今天发生了什么？也可以只写下一种心情……"
+              required
+            ></textarea>
+            <div class="diary-form-footer">
+              <span><b id="diaryCharacterCount">0</b>/5000</span>
+              <div class="diary-actions">
+                <button class="secondary-button danger-button" id="deleteDiary" type="button" hidden>删除</button>
+                <button class="primary-action" type="submit"><span id="diarySubmitLabel">保存日记</span> <span>＋</span></button>
+              </div>
+            </div>
+          </form>
+
+          <aside class="diary-list-panel" aria-label="已经保存的日记">
+            <div class="subsection-heading">
+              <div>
+                <p class="card-label">SAVED DAYS</p>
+                <h3>写过的日子</h3>
+              </div>
+              <span id="diaryCount">0 篇</span>
+            </div>
+            <div class="diary-list" id="diaryList" aria-live="polite"></div>
+          </aside>
+        </div>
+
+        <section class="backup-card" aria-labelledby="backupTitle">
+          <div>
+            <p class="card-label">BACKUP & RESTORE</p>
+            <h3 id="backupTitle">数据小行囊</h3>
+            <p>把便签和日记一起装进 JSON 文件，换设备或清理浏览器前可以先备份。</p>
+          </div>
+          <div class="backup-actions">
+            <button class="secondary-button" id="exportData" type="button">导出备份 <span>↓</span></button>
+            <button class="secondary-button" id="chooseImport" type="button">导入恢复 <span>↑</span></button>
+            <input id="importFile" type="file" accept="application/json,.json" hidden />
+          </div>
+          <p class="backup-status" id="backupStatus" role="status" aria-live="polite"></p>
+        </section>
+      </section>
     </main>
 
     <footer>
@@ -138,5 +198,40 @@
       <p>愿每一次探索，都温柔而闪亮。</p>
       <small>AXU & SHUHAN · 2026</small>
     </footer>
+
+    <nav class="bottom-nav panel" aria-label="主要页面">
+      <button class="bottom-nav-item is-active" type="button" data-target="home" aria-current="page">
+        <span aria-hidden="true">⌂</span>
+        <small>首页</small>
+      </button>
+      <button class="bottom-nav-item" type="button" data-target="notes">
+        <span aria-hidden="true">▱</span>
+        <small>便签</small>
+      </button>
+      <button class="bottom-nav-item" type="button" data-target="diary">
+        <span aria-hidden="true">□</span>
+        <small>日记</small>
+      </button>
+    </nav>
+
+    <div class="import-dialog" id="importDialog" hidden>
+      <div class="import-dialog-backdrop" data-close-import></div>
+      <section class="import-dialog-card panel" role="dialog" aria-modal="true" aria-labelledby="importDialogTitle">
+        <p class="eyebrow"><span></span> RESTORE DATA</p>
+        <h2 id="importDialogTitle">怎样恢复这份备份？</h2>
+        <p id="importSummary">已确认备份文件格式正确。</p>
+        <div class="import-options">
+          <button class="secondary-button" id="mergeImport" type="button">
+            <strong>合并数据</strong>
+            <span>保留现有内容，只补充备份中的便签和日记。</span>
+          </button>
+          <button class="secondary-button danger-outline" id="overwriteImport" type="button">
+            <strong>覆盖数据</strong>
+            <span>用备份完整替换当前便签和日记。</span>
+          </button>
+        </div>
+        <button class="dialog-cancel" id="cancelImport" type="button">取消</button>
+      </section>
+    </div>
   </body>
 </html>
