@@ -33,6 +33,10 @@
         <span>Our Little Lab</span>
       </a>
       <div class="header-actions">
+        <button class="search-button" id="openSearch" type="button" aria-label="搜索便签和日记">
+          <span aria-hidden="true">⌕</span>
+          <span class="search-label">搜索</span>
+        </button>
         <button class="install-button" id="installApp" type="button" hidden>
           <span aria-hidden="true">↓</span>
           <span>安装到桌面</span>
@@ -149,6 +153,16 @@
               <label for="diaryDate">日记日期</label>
               <input id="diaryDate" name="date" type="date" required />
             </div>
+            <fieldset class="mood-picker">
+              <legend>今天的心情</legend>
+              <div class="mood-options">
+                <label><input type="radio" name="mood" value="happy" /><span>😊</span><small>开心</small></label>
+                <label><input type="radio" name="mood" value="calm" /><span>🌿</span><small>平静</small></label>
+                <label><input type="radio" name="mood" value="excited" /><span>✨</span><small>期待</small></label>
+                <label><input type="radio" name="mood" value="tired" /><span>🥱</span><small>疲惫</small></label>
+                <label><input type="radio" name="mood" value="sad" /><span>🌧️</span><small>低落</small></label>
+              </div>
+            </fieldset>
             <label class="sr-only" for="diaryInput">日记内容</label>
             <textarea
               id="diaryInput"
@@ -166,6 +180,17 @@
           </form>
 
           <aside class="diary-list-panel" aria-label="已经保存的日记">
+            <section class="diary-calendar" aria-label="日记月历">
+              <div class="calendar-toolbar">
+                <button id="previousMonth" type="button" aria-label="上一个月">‹</button>
+                <strong id="calendarTitle">本月</strong>
+                <button id="nextMonth" type="button" aria-label="下一个月">›</button>
+              </div>
+              <div class="calendar-weekdays" aria-hidden="true">
+                <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+              </div>
+              <div class="calendar-grid" id="calendarGrid"></div>
+            </section>
             <div class="subsection-heading">
               <div>
                 <p class="card-label">SAVED DAYS</p>
@@ -231,6 +256,25 @@
           </button>
         </div>
         <button class="dialog-cancel" id="cancelImport" type="button">取消</button>
+      </section>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+      <div class="search-dialog-backdrop" data-close-search></div>
+      <section class="search-dialog-card panel" role="dialog" aria-modal="true" aria-labelledby="searchDialogTitle">
+        <div class="search-dialog-heading">
+          <div>
+            <p class="eyebrow"><span></span> FIND A MEMORY</p>
+            <h2 id="searchDialogTitle">寻找一段记录</h2>
+          </div>
+          <button id="closeSearch" type="button" aria-label="关闭搜索">×</button>
+        </div>
+        <label class="search-field" for="searchInput">
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" maxlength="80" placeholder="搜索便签或日记里的文字……" autocomplete="off" />
+        </label>
+        <p class="search-hint" id="searchHint">输入关键词，就能从便签和日记中一起寻找。</p>
+        <div class="search-results" id="searchResults" aria-live="polite"></div>
       </section>
     </div>
   </body>

@@ -162,6 +162,7 @@ footer {
 }
 
 .theme-toggle,
+.search-button,
 .install-button {
   display: flex;
   align-items: center;
@@ -179,6 +180,12 @@ footer {
   color: var(--surface-solid);
   border-color: transparent;
   background: var(--text);
+}
+
+.search-button > span:first-child {
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .install-button[hidden] {
@@ -659,6 +666,61 @@ h1 em {
   background: var(--surface);
 }
 
+.mood-picker {
+  margin: 18px 0 0;
+  padding: 0 0 18px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.mood-picker legend {
+  margin-bottom: 12px;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mood-options {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.mood-options label {
+  position: relative;
+  display: grid;
+  min-height: 66px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+}
+
+.mood-options input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.mood-options label:has(input:checked) {
+  border-color: var(--rose);
+  background: var(--rose-soft);
+  box-shadow: 0 8px 24px rgba(156, 104, 92, 0.1);
+}
+
+.mood-options span {
+  font-size: 20px;
+}
+
+.mood-options small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
 .diary-editor textarea {
   display: block;
   width: 100%;
@@ -723,6 +785,94 @@ h1 em {
   padding: 22px;
 }
 
+.diary-calendar {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.calendar-toolbar {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.calendar-toolbar button {
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+}
+
+.calendar-toolbar strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekdays {
+  margin-bottom: 6px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 9px;
+}
+
+.calendar-day {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  place-items: center;
+  font-family: Inter, "Microsoft YaHei", sans-serif;
+  font-size: 11px;
+}
+
+.calendar-day.is-outside {
+  color: var(--muted);
+  opacity: 0.35;
+}
+
+.calendar-day.is-today {
+  border-color: var(--sage);
+}
+
+.calendar-day.is-selected {
+  color: var(--surface-solid);
+  background: var(--text);
+}
+
+.calendar-day.has-diary::after {
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--rose);
+  content: "";
+}
+
+.calendar-day.is-selected.has-diary::after {
+  background: var(--surface-solid);
+}
+
 .subsection-heading {
   justify-content: space-between;
   padding-bottom: 18px;
@@ -745,6 +895,17 @@ h1 em {
   display: grid;
   margin-top: 14px;
   gap: 10px;
+}
+
+.diary-list-item .diary-list-date {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.diary-list-mood {
+  font-size: 16px;
 }
 
 .diary-list-item {
@@ -933,6 +1094,152 @@ h1 em {
   background: transparent;
 }
 
+.search-dialog {
+  position: fixed;
+  z-index: 45;
+  inset: 0;
+  display: grid;
+  padding: 20px;
+  place-items: center;
+}
+
+.search-dialog[hidden] {
+  display: none;
+}
+
+.search-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 27, 25, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.search-dialog-card {
+  position: relative;
+  width: min(640px, 100%);
+  max-height: min(720px, calc(100vh - 40px));
+  padding: 30px;
+  overflow: auto;
+  border-radius: 30px;
+}
+
+.search-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.search-dialog-heading h2 {
+  margin: 13px 0 0;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.search-dialog-heading > button {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 20px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+  padding: 0 18px;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface-solid);
+}
+
+.search-field > span {
+  color: var(--muted);
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+}
+
+.search-field input {
+  width: 100%;
+  min-height: 54px;
+  color: var(--text);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.search-field input::placeholder {
+  color: var(--muted);
+  opacity: 0.68;
+}
+
+.search-hint {
+  margin: 14px 2px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.search-results {
+  display: grid;
+  margin-top: 18px;
+  gap: 10px;
+}
+
+.search-result {
+  width: 100%;
+  padding: 16px 18px;
+  cursor: pointer;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  text-align: left;
+}
+
+.search-result-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-family: Inter, "Microsoft YaHei", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.search-result p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.search-result mark {
+  padding: 0 2px;
+  color: inherit;
+  border-radius: 3px;
+  background: var(--rose-soft);
+}
+
+.empty-search {
+  padding: 34px 18px;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
 footer {
   display: flex;
   align-items: center;
@@ -1016,11 +1323,13 @@ button:hover,
 
   .brand > span:last-child,
   .theme-label,
+  .search-label,
   .install-button span:last-child {
     display: none;
   }
 
   .theme-toggle,
+  .search-button,
   .install-button {
     width: 42px;
     height: 42px;
@@ -1091,6 +1400,19 @@ button:hover,
     min-height: 280px;
   }
 
+  .mood-options {
+    gap: 6px;
+  }
+
+  .mood-options label {
+    min-height: 60px;
+    border-radius: 14px;
+  }
+
+  .calendar-day {
+    border-radius: 10px;
+  }
+
   .backup-card {
     align-items: stretch;
     flex-direction: column;
@@ -1113,6 +1435,17 @@ button:hover,
   }
 
   .import-dialog-card {
+    padding: 26px 22px;
+    border-radius: 26px;
+  }
+
+  .search-dialog {
+    align-items: end;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .search-dialog-card {
+    max-height: min(760px, calc(100vh - 20px - env(safe-area-inset-bottom, 0px)));
     padding: 26px 22px;
     border-radius: 26px;
   }
