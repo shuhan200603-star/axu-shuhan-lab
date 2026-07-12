@@ -31,15 +31,34 @@ const importSummary = document.querySelector("#importSummary");
 const mergeImport = document.querySelector("#mergeImport");
 const overwriteImport = document.querySelector("#overwriteImport");
 const cancelImport = document.querySelector("#cancelImport");
+const moodInputs = [...document.querySelectorAll('input[name="mood"]')];
+const calendarTitle = document.querySelector("#calendarTitle");
+const calendarGrid = document.querySelector("#calendarGrid");
+const previousMonth = document.querySelector("#previousMonth");
+const nextMonth = document.querySelector("#nextMonth");
+const openSearch = document.querySelector("#openSearch");
+const searchDialog = document.querySelector("#searchDialog");
+const closeSearch = document.querySelector("#closeSearch");
+const searchInput = document.querySelector("#searchInput");
+const searchHint = document.querySelector("#searchHint");
+const searchResults = document.querySelector("#searchResults");
 
 const notesKey = "axu-shuhan-lab-notes";
 const diariesKey = "axu-shuhan-lab-diaries";
 const backupAppId = "axu-shuhan-lab";
 const validViews = new Set(["home", "notes", "diary"]);
+const moods = {
+  happy: { emoji: "😊", label: "开心" },
+  calm: { emoji: "🌿", label: "平静" },
+  excited: { emoji: "✨", label: "期待" },
+  tired: { emoji: "🥱", label: "疲惫" },
+  sad: { emoji: "🌧️", label: "低落" },
+};
 
 let deferredInstallPrompt = null;
 let pendingImport = null;
 let backupStatusTimer = null;
+let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
 const experiments = [
   "把一个小小的想法，认真做成可以看见的东西。",
@@ -88,6 +107,21 @@ function formatDiaryDate(value) {
     day: "numeric",
     weekday: "short",
   }).format(new Date(year, month - 1, day));
+}
+
+function dateFromValue(value) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function setDiaryMood(mood) {
+  moodInputs.forEach((input) => {
+    input.checked = input.value === mood;
+  });
+}
+
+function selectedMood() {
+  return moodInputs.find((input) => input.checked)?.value || null;
 }
 
 function updateClock() {
@@ -167,6 +201,7 @@ function renderNotes() {
   notes.forEach((note) => {
     const card = document.createElement("article");
     card.className = "sticky-note";
+    card.dataset.noteId = String(note.id);
 
     const content = document.createElement("p");
     content.textContent = note.content;
@@ -199,10 +234,51 @@ function selectedDiary() {
 function loadDiaryForDate() {
   const entry = selectedDiary();
   diaryInput.value = entry?.content || "";
+  setDiaryMood(entry?.mood || null);
   diaryCharacterCount.textContent = String(diaryInput.value.length);
   diarySubmitLabel.textContent = entry ? "保存修改" : "保存日记";
   deleteDiary.hidden = !entry;
+  const selectedDate = dateFromValue(diaryDate.value);
+  calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+  renderCalendar();
   renderDiaryList();
+}
+
+function renderCalendar() {
+  calendarGrid.replaceChildren();
+  calendarTitle.textContent = new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+  }).format(calendarMonth);
+
+  const year = calendarMonth.getFullYear();
+  const month = calendarMonth.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const mondayOffset = (firstDay.getDay() + 6) % 7;
+  const gridStart = new Date(year, month, 1 - mondayOffset);
+  const today = localDateValue();
+  const diaryDates = new Set(diaries.map((entry) => entry.date));
+
+  for (let index = 0; index < 42; index += 1) {
+    const date = new Date(gridStart);
+    date.setDate(gridStart.getDate() + index);
+    const value = localDateValue(date);
+    const button = document.createElement("button");
+    button.className = "calendar-day";
+    button.classList.toggle("is-outside", date.getMonth() !== month);
+    button.classList.toggle("is-today", value === today);
+    button.classList.toggle("is-selected", value === diaryDate.value);
+    button.classList.toggle("has-diary", diaryDates.has(value));
+    button.type = "button";
+    button.textContent = String(date.getDate());
+    button.setAttribute("aria-label", `${formatDiaryDate(value)}${diaryDates.has(value) ? "，有日记" : ""}`);
+    button.addEventListener("click", () => {
+      diaryDate.value = value;
+      loadDiaryForDate();
+      diaryInput.focus();
+    });
+    calendarGrid.append(button);
+  }
 }
 
 function renderDiaryList() {
@@ -224,19 +300,137 @@ function renderDiaryList() {
     button.classList.toggle("is-selected", entry.date === diaryDate.value);
     button.type = "button";
 
+    const dateRow = document.createElement("span");
+    dateRow.className = "diary-list-date";
     const date = document.createElement("strong");
     date.textContent = formatDiaryDate(entry.date);
+    dateRow.append(date);
+
+    if (moods[entry.mood]) {
+      const mood = document.createElement("span");
+      mood.className = "diary-list-mood";
+      mood.textContent = moods[entry.mood].emoji;
+      mood.setAttribute("aria-label", moods[entry.mood].label);
+      dateRow.append(mood);
+    }
 
     const preview = document.createElement("span");
     preview.textContent = entry.content.replace(/\s+/g, " ").trim() || "（空白日记）";
 
-    button.append(date, preview);
+    button.append(dateRow, preview);
     button.addEventListener("click", () => {
       diaryDate.value = entry.date;
       loadDiaryForDate();
       diaryInput.focus();
     });
     diaryList.append(button);
+  });
+}
+
+function appendHighlightedText(container, text, query) {
+  const normalizedText = text.toLocaleLowerCase("zh-CN");
+  const normalizedQuery = query.toLocaleLowerCase("zh-CN");
+  let cursor = 0;
+  let matchIndex = normalizedText.indexOf(normalizedQuery);
+
+  while (matchIndex >= 0) {
+    container.append(document.createTextNode(text.slice(cursor, matchIndex)));
+    const mark = document.createElement("mark");
+    mark.textContent = text.slice(matchIndex, matchIndex + query.length);
+    container.append(mark);
+    cursor = matchIndex + query.length;
+    matchIndex = normalizedText.indexOf(normalizedQuery, cursor);
+  }
+
+  container.append(document.createTextNode(text.slice(cursor)));
+}
+
+function closeSearchDialog() {
+  searchDialog.hidden = true;
+  openSearch.focus();
+}
+
+function openSearchDialog() {
+  searchDialog.hidden = false;
+  searchInput.focus();
+  renderSearchResults(searchInput.value);
+}
+
+function renderSearchResults(rawQuery) {
+  const query = rawQuery.trim();
+  searchResults.replaceChildren();
+
+  if (!query) {
+    searchHint.textContent = "输入关键词，就能从便签和日记中一起寻找。";
+    return;
+  }
+
+  const normalizedQuery = query.toLocaleLowerCase("zh-CN");
+  const noteMatches = notes
+    .filter((note) => String(note.content || "").toLocaleLowerCase("zh-CN").includes(normalizedQuery))
+    .map((note) => ({
+      type: "note",
+      id: String(note.id),
+      content: String(note.content),
+      sortValue: Number(note.createdAt) || 0,
+      label: `便签 · ${formatNoteDate(note.createdAt)}`,
+    }));
+  const diaryMatches = diaries
+    .filter((entry) => String(entry.content || "").toLocaleLowerCase("zh-CN").includes(normalizedQuery))
+    .map((entry) => ({
+      type: "diary",
+      date: entry.date,
+      content: String(entry.content),
+      mood: entry.mood,
+      sortValue: dateFromValue(entry.date).getTime(),
+      label: `日记 · ${formatDiaryDate(entry.date)}`,
+    }));
+  const matches = [...noteMatches, ...diaryMatches].sort((a, b) => b.sortValue - a.sortValue).slice(0, 30);
+  searchHint.textContent = matches.length > 0 ? `找到 ${matches.length} 条记录。` : "没有找到相关记录，换个词试试吧。";
+
+  if (matches.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-search";
+    empty.textContent = "这段文字还没有出现在实验室里。\n也许它正等着被写下来。";
+    searchResults.append(empty);
+    return;
+  }
+
+  matches.forEach((result) => {
+    const button = document.createElement("button");
+    button.className = "search-result";
+    button.type = "button";
+
+    const meta = document.createElement("span");
+    meta.className = "search-result-meta";
+    const label = document.createElement("span");
+    label.textContent = result.label;
+    const mood = document.createElement("span");
+    mood.textContent = moods[result.mood]?.emoji || (result.type === "note" ? "▱" : "□");
+    meta.append(label, mood);
+
+    const preview = document.createElement("p");
+    appendHighlightedText(preview, result.content.replace(/\s+/g, " ").trim(), query);
+    button.append(meta, preview);
+
+    button.addEventListener("click", () => {
+      closeSearchDialog();
+      if (result.type === "diary") {
+        diaryDate.value = result.date;
+        loadDiaryForDate();
+        showView("diary");
+        window.setTimeout(() => diaryInput.focus(), 250);
+      } else {
+        showView("notes");
+        window.setTimeout(() => {
+          document.querySelector(`[data-note-id="${CSS.escape(result.id)}"]`)?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }, 250);
+      }
+    });
+    searchResults.append(button);
   });
 }
 
@@ -286,7 +480,10 @@ function validateBackup(data) {
     }
     const updatedAt = Number(entry.updatedAt);
     if (!Number.isFinite(updatedAt)) throw new Error(`第 ${index + 1} 篇日记更新时间不正确。`);
-    return { date: entry.date, content: entry.content, updatedAt };
+    const mood = typeof entry.mood === "string" && moods[entry.mood] ? entry.mood : null;
+    return mood
+      ? { date: entry.date, content: entry.content, updatedAt, mood }
+      : { date: entry.date, content: entry.content, updatedAt };
   });
 
   return { notes: cleanNotes, diaries: cleanDiaries };
@@ -348,6 +545,11 @@ navItems.forEach((item) => {
   item.addEventListener("click", () => showView(item.dataset.target));
 });
 
+openSearch.addEventListener("click", openSearchDialog);
+closeSearch.addEventListener("click", closeSearchDialog);
+document.querySelector("[data-close-search]").addEventListener("click", closeSearchDialog);
+searchInput.addEventListener("input", () => renderSearchResults(searchInput.value));
+
 window.addEventListener("hashchange", () => {
   showView(location.hash.slice(1), false);
 });
@@ -376,6 +578,16 @@ noteForm.addEventListener("submit", (event) => {
 
 diaryDate.addEventListener("change", loadDiaryForDate);
 
+previousMonth.addEventListener("click", () => {
+  calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+  renderCalendar();
+});
+
+nextMonth.addEventListener("click", () => {
+  calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+  renderCalendar();
+});
+
 diaryInput.addEventListener("input", () => {
   diaryCharacterCount.textContent = String(diaryInput.value.length);
 });
@@ -387,7 +599,8 @@ diaryForm.addEventListener("submit", (event) => {
   if (!date || !content) return;
 
   const existingIndex = diaries.findIndex((entry) => entry.date === date);
-  const entry = { date, content, updatedAt: Date.now() };
+  const mood = selectedMood();
+  const entry = mood ? { date, content, updatedAt: Date.now(), mood } : { date, content, updatedAt: Date.now() };
   if (existingIndex >= 0) diaries.splice(existingIndex, 1, entry);
   else diaries.push(entry);
 
@@ -449,6 +662,7 @@ document.querySelector("[data-close-import]").addEventListener("click", closeImp
 
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !importDialog.hidden) closeImportDialog();
+  if (event.key === "Escape" && !searchDialog.hidden) closeSearchDialog();
 });
 
 window.addEventListener("beforeinstallprompt", (event) => {
