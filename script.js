@@ -70,12 +70,20 @@ const memoryCalendarGrid = document.querySelector("#memoryCalendarGrid");
 const previousMemoryMonth = document.querySelector("#previousMemoryMonth");
 const nextMemoryMonth = document.querySelector("#nextMemoryMonth");
 const timeMilestones = [...document.querySelectorAll(".time-milestone")];
+const dailyMessageDate = document.querySelector("#dailyMessageDate");
+const dailyMessageFavorite = document.querySelector("#dailyMessageFavorite");
+const dailyMessageHistory = document.querySelector("#dailyMessageHistory");
+const dailyMessageHistoryPanel = document.querySelector("#dailyMessageHistoryPanel");
+const dailyMessageHistoryList = document.querySelector("#dailyMessageHistoryList");
+const notesWorkspaceTabs = [...document.querySelectorAll("[data-notes-target]")];
+const themeChoices = [...document.querySelectorAll("[data-theme-choice]")];
 
 const notesKey = "axu-shuhan-lab-notes";
 const diariesKey = "axu-shuhan-lab-diaries";
 const memoriesKey = "axu-shuhan-lab-memories";
+const dailyMessageFavoritesKey = "axu-shuhan-lab-daily-message-favorites";
 const backupAppId = "axu-shuhan-lab";
-const validViews = new Set(["home", "notes", "diary", "memories", "chat"]);
+const validViews = new Set(["home", "notes", "diary", "memories", "chat", "settings"]);
 const memoryCategories = ["心话", "日常", "纪念", "承诺", "愿望"];
 const relationshipConfig = Object.freeze({
   timeZone: "Asia/Shanghai",
@@ -98,6 +106,7 @@ let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 let memoryCalendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let activeMemoryCategory = "all";
 let milestoneAnimationFrame = null;
+let currentDailyMessage = null;
 
 const experiments = [
   "把一个小小的想法，认真做成可以看见的东西。",
@@ -106,6 +115,23 @@ const experiments = [
   "学会一个新东西，然后用自己的话讲出来。",
   "允许今天的计划里，出现一点意料之外的快乐。",
   "把喜欢的颜色、句子和瞬间放在同一个角落。",
+];
+
+const dailyMessages = [
+  "慢一点也没关系，我会陪你把今天走成喜欢的样子。",
+  "今天也请先照顾好自己，剩下的事情我们一件一件来。",
+  "你认真生活的每一个小瞬间，都值得被温柔收藏。",
+  "不用急着成为答案，你现在的样子就已经很珍贵。",
+  "如果今天有一点累，就把心事先放在我这里。",
+  "愿你今天遇见的风、光和好消息，都比昨天多一点。",
+  "小小的进步也算数，我一直有认真看见。",
+  "别担心走得慢，重要的是我们仍在一起向前。",
+  "今天请为自己留一点空白，让喜欢的事情悄悄发生。",
+  "你不需要时时闪亮，安静地做自己也很好。",
+  "有些答案会晚一点来，但温柔从不会迟到。",
+  "把今天最柔软的一分钟留给自己，也留给我们。",
+  "无论今天是什么天气，我都希望你的心里有一盏灯。",
+  "你已经走过很多路了，今天也值得被好好拥抱。",
 ];
 
 function readStoredArray(key) {
@@ -182,6 +208,70 @@ function shanghaiDateValue(date = new Date()) {
 function dateOrdinal(value) {
   const [year, month, day] = value.split("-").map(Number);
   return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
+}
+
+function dailyMessageForDate(dateValue) {
+  const index = Math.abs(dateOrdinal(dateValue)) % dailyMessages.length;
+  return {
+    id: `${dateValue}-${index}`,
+    date: dateValue,
+    text: dailyMessages[index],
+    source: "local",
+  };
+}
+
+async function fetchDailyMessage(date = new Date()) {
+  const dateValue = typeof date === "string" ? date : shanghaiDateValue(date);
+  // 以后接入时，只需要在这里替换成 fetch(`/api/daily-message?date=${dateValue}`)。
+  return dailyMessageForDate(dateValue);
+}
+
+function formatDailyMessageDate(dateValue) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(new Date(year, month - 1, day));
+}
+
+function readDailyMessageFavorites() {
+  const value = readStoredArray(dailyMessageFavoritesKey);
+  return new Set(value.map(String));
+}
+
+function updateDailyMessageFavoriteState() {
+  if (!currentDailyMessage) return;
+  const isFavorite = readDailyMessageFavorites().has(currentDailyMessage.id);
+  dailyMessageFavorite.classList.toggle("is-active", isFavorite);
+  dailyMessageFavorite.setAttribute("aria-pressed", String(isFavorite));
+  dailyMessageFavorite.setAttribute("aria-label", isFavorite ? "取消收藏今天这句话" : "收藏今天这句话");
+  dailyMessageFavorite.querySelector("span").textContent = isFavorite ? "♥" : "♡";
+}
+
+async function renderDailyMessage(date = new Date()) {
+  currentDailyMessage = await fetchDailyMessage(date);
+  greeting.textContent = currentDailyMessage.text;
+  dailyMessageDate.dateTime = currentDailyMessage.date;
+  dailyMessageDate.textContent = formatDailyMessageDate(currentDailyMessage.date);
+  updateDailyMessageFavoriteState();
+}
+
+async function renderDailyMessageHistory() {
+  dailyMessageHistoryList.replaceChildren();
+  const todayOrdinal = dateOrdinal(shanghaiDateValue());
+  for (let offset = 1; offset <= 7; offset += 1) {
+    const dateValue = new Date((todayOrdinal - offset) * 86_400_000).toISOString().slice(0, 10);
+    const message = await fetchDailyMessage(dateValue);
+    const item = document.createElement("article");
+    const time = document.createElement("time");
+    const text = document.createElement("p");
+    time.dateTime = message.date;
+    time.textContent = formatDailyMessageDate(message.date);
+    text.textContent = message.text;
+    item.append(time, text);
+    dailyMessageHistoryList.append(item);
+  }
 }
 
 function relationshipMetrics(date = new Date()) {
@@ -292,11 +382,7 @@ function selectedMood() {
 
 function updateClock() {
   const now = new Date();
-  const hour = Number(new Intl.DateTimeFormat("en-US", {
-    timeZone: relationshipConfig.timeZone,
-    hour: "2-digit",
-    hour12: false,
-  }).format(now));
+  const todayValue = shanghaiDateValue(now);
 
   dateText.textContent = new Intl.DateTimeFormat("zh-CN", {
     timeZone: relationshipConfig.timeZone,
@@ -312,11 +398,11 @@ function updateClock() {
     hour12: false,
   }).format(now);
 
-  if (hour < 6) greeting.textContent = "夜深了，灵感也要轻轻说话。";
-  else if (hour < 11) greeting.textContent = "早上好，今天也要温柔地探索。";
-  else if (hour < 14) greeting.textContent = "中午好，先照顾好自己再出发。";
-  else if (hour < 18) greeting.textContent = "下午好，新的发现正在路上。";
-  else greeting.textContent = "晚上好，实验室为你留了一盏灯。";
+  if (currentDailyMessage?.date !== todayValue) {
+    renderDailyMessage(now).catch(() => {
+      greeting.textContent = "今天也请先照顾好自己，我们慢慢来。";
+    });
+  }
   updateRelationshipTime();
 }
 
@@ -327,20 +413,32 @@ function applyTheme(theme) {
   themeLabel.textContent = isNight ? "白天" : "夜晚";
   themeToggle.setAttribute("aria-label", `切换${isNight ? "白天" : "夜晚"}主题`);
   themeColor.content = isNight ? "#211c2a" : "#f8f4f7";
+  themeChoices.forEach((choice) => {
+    const isActive = choice.dataset.themeChoice === theme;
+    choice.classList.toggle("is-active", isActive);
+    choice.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function showView(target, updateLocation = true) {
   const nextView = validViews.has(target) ? target : "home";
+  const activeNavView = nextView === "diary" ? "notes" : nextView;
 
   appViews.forEach((view) => {
     view.hidden = view.dataset.view !== nextView;
   });
 
   navItems.forEach((item) => {
-    const isActive = item.dataset.target === nextView;
+    const isActive = item.dataset.target === activeNavView;
     item.classList.toggle("is-active", isActive);
     if (isActive) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
+  });
+
+  notesWorkspaceTabs.forEach((tab) => {
+    const isActive = tab.dataset.notesTarget === nextView;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-selected", String(isActive));
   });
 
   if (updateLocation) history.replaceState(null, "", `#${nextView}`);
@@ -1010,6 +1108,34 @@ themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "night" ? "day" : "night";
   localStorage.setItem("axu-shuhan-lab-theme", nextTheme);
   applyTheme(nextTheme);
+});
+
+themeChoices.forEach((choice) => {
+  choice.addEventListener("click", () => {
+    const nextTheme = choice.dataset.themeChoice;
+    localStorage.setItem("axu-shuhan-lab-theme", nextTheme);
+    applyTheme(nextTheme);
+  });
+});
+
+notesWorkspaceTabs.forEach((tab) => {
+  tab.addEventListener("click", () => showView(tab.dataset.notesTarget));
+});
+
+dailyMessageFavorite.addEventListener("click", () => {
+  if (!currentDailyMessage) return;
+  const favorites = readDailyMessageFavorites();
+  if (favorites.has(currentDailyMessage.id)) favorites.delete(currentDailyMessage.id);
+  else favorites.add(currentDailyMessage.id);
+  localStorage.setItem(dailyMessageFavoritesKey, JSON.stringify([...favorites]));
+  updateDailyMessageFavoriteState();
+});
+
+dailyMessageHistory.addEventListener("click", async () => {
+  const willOpen = dailyMessageHistoryPanel.hidden;
+  if (willOpen) await renderDailyMessageHistory();
+  dailyMessageHistoryPanel.hidden = !willOpen;
+  dailyMessageHistory.setAttribute("aria-expanded", String(willOpen));
 });
 
 shuffleExperiment.addEventListener("click", () => {

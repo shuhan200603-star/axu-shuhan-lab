@@ -52,38 +52,10 @@
 
     <main id="top">
       <section class="app-view" id="homeView" data-view="home">
-      <section class="hero panel">
-        <div class="hero-copy">
-          <p class="eyebrow"><span></span> WELCOME TO OUR LITTLE LAB</p>
-          <p class="greeting" id="greeting">今天也要温柔地探索。</p>
-          <h1>阿序和书函的<em>实验室</em></h1>
-          <p class="intro">
-            在这里收藏灵感，尝试有趣的想法，<br />
-            也为每一次小小的发现留一盏灯。
-          </p>
-          <div class="hero-actions">
-            <a class="primary-button" href="#notes">写一张便签 <span>↘</span></a>
-            <span class="lab-status"><i></i> 实验室营业中</span>
-          </div>
-        </div>
-
-        <aside class="clock-card" aria-label="当前时间">
-          <div class="clock-glow"></div>
-          <p id="dateText">正在读取今天的日期</p>
-          <strong id="timeText">--:--</strong>
-          <span>Asia · Shanghai</span>
-          <div class="clock-footer">
-            <span>今日天气</span>
-            <b>内心晴朗 ☀</b>
-          </div>
-        </aside>
-      </section>
-
       <section class="shared-time panel" aria-labelledby="sharedTimeTitle">
         <div class="shared-time-heading">
           <p class="eyebrow"><span></span> OUR TIME TOGETHER</p>
-          <h2 id="sharedTimeTitle">我们的时间</h2>
-          <p>每一个上海的自然日，都从相遇那天开始认真收藏。</p>
+          <h2 id="sharedTimeTitle">阿序和我</h2>
         </div>
         <div class="shared-time-grid">
           <button class="time-milestone time-milestone-primary is-active" type="button" data-milestone="together" aria-pressed="true">
@@ -110,6 +82,56 @@
         </div>
       </section>
 
+      <section class="hero home-widget-grid" aria-label="今日小组件">
+        <article class="daily-message-widget panel home-widget home-widget-wide" aria-labelledby="dailyMessageTitle">
+          <div class="daily-message-header">
+            <div>
+              <p class="card-label">A NOTE FROM AXU</p>
+              <h2 id="dailyMessageTitle">阿序今日一句</h2>
+            </div>
+            <time id="dailyMessageDate">今天</time>
+          </div>
+          <blockquote id="dailyMessageText"><span id="greeting">正在准备今天的话……</span></blockquote>
+          <div class="daily-message-actions">
+            <button id="dailyMessageFavorite" type="button" aria-label="收藏今天这句话" aria-pressed="false">
+              <span aria-hidden="true">♡</span><small>收藏</small>
+            </button>
+            <button id="dailyMessageHistory" type="button" aria-expanded="false" aria-controls="dailyMessageHistoryPanel">
+              <span aria-hidden="true">⌁</span><small>往日</small>
+            </button>
+          </div>
+          <div class="daily-message-history" id="dailyMessageHistoryPanel" hidden>
+            <p class="card-label">PAST SEVEN DAYS</p>
+            <div id="dailyMessageHistoryList"></div>
+          </div>
+        </article>
+
+        <aside class="clock-card panel home-widget" aria-label="今天的日期和时间">
+          <div class="clock-widget-header">
+            <p class="card-label">TODAY</p>
+            <span class="clock-status-dot" aria-hidden="true"></span>
+          </div>
+          <strong id="timeText">--:--</strong>
+          <p id="dateText">正在读取今天的日期</p>
+          <div class="clock-footer">
+            <span>今日状态</span>
+            <b>内心晴朗 ☀</b>
+          </div>
+        </aside>
+
+        <article class="experiment-card panel home-widget">
+          <div class="experiment-top">
+            <div>
+              <p class="card-label">TODAY'S EXPERIMENT</p>
+              <h2>今日实验</h2>
+            </div>
+            <span aria-hidden="true">⌁</span>
+          </div>
+          <p class="experiment-text" id="experimentText">把一个小小的想法，认真做成可以看见的东西。</p>
+          <button class="shuffle-button" id="shuffleExperiment" type="button">换一个灵感 <span>↻</span></button>
+        </article>
+      </section>
+
       <section class="lab-grid" aria-label="实验室成员与今日实验">
         <article class="member-card panel">
           <div class="avatar avatar-axu">序</div>
@@ -130,18 +152,6 @@
           </div>
           <span class="member-tag">HUMAN · 主理人</span>
         </article>
-
-        <article class="experiment-card panel">
-          <div class="experiment-top">
-            <div>
-              <p class="card-label">TODAY'S EXPERIMENT</p>
-              <h2>今日实验</h2>
-            </div>
-            <span aria-hidden="true">⌁</span>
-          </div>
-          <p class="experiment-text" id="experimentText">把一个小小的想法，认真做成可以看见的东西。</p>
-          <button class="shuffle-button" id="shuffleExperiment" type="button">换一个灵感 <span>↻</span></button>
-        </article>
       </section>
       </section>
 
@@ -152,6 +162,11 @@
             <h2>实验室便签墙</h2>
           </div>
           <p>写下此刻不想弄丢的事情。便签只保存在这台电脑的浏览器里。</p>
+        </div>
+
+        <div class="notes-workspace-tabs" role="tablist" aria-label="便签与日记">
+          <button class="is-active" type="button" role="tab" data-notes-target="notes" aria-selected="true">Notes · 便签</button>
+          <button type="button" role="tab" data-notes-target="diary" aria-selected="false">Diary · 日记</button>
         </div>
 
         <form class="note-form" id="noteForm">
@@ -178,6 +193,11 @@
             <h2>实验室日记</h2>
           </div>
           <p>把一天收进一页纸里。日记暂时只保存在当前浏览器中。</p>
+        </div>
+
+        <div class="notes-workspace-tabs" role="tablist" aria-label="便签与日记">
+          <button type="button" role="tab" data-notes-target="notes" aria-selected="false">Notes · 便签</button>
+          <button class="is-active" type="button" role="tab" data-notes-target="diary" aria-selected="true">Diary · 日记</button>
         </div>
 
         <div class="diary-layout">
@@ -235,19 +255,6 @@
           </aside>
         </div>
 
-        <section class="backup-card" aria-labelledby="backupTitle">
-          <div>
-            <p class="card-label">BACKUP & RESTORE</p>
-            <h3 id="backupTitle">数据小行囊</h3>
-            <p>把便签、日记和记忆一起装进 JSON 文件，换设备或清理浏览器前可以先备份。</p>
-          </div>
-          <div class="backup-actions">
-            <button class="secondary-button" id="exportData" type="button">导出备份 <span>↓</span></button>
-            <button class="secondary-button" id="chooseImport" type="button">导入恢复 <span>↑</span></button>
-            <input id="importFile" type="file" accept="application/json,.json" hidden />
-          </div>
-          <p class="backup-status" id="backupStatus" role="status" aria-live="polite"></p>
-        </section>
       </section>
 
       <section class="memories-section panel app-view" id="memories" data-view="memories" hidden>
@@ -359,6 +366,88 @@
           </span>
         </div>
       </section>
+
+      <section class="settings-section panel app-view" id="settings" data-view="settings" hidden>
+        <div class="section-heading settings-heading">
+          <div>
+            <p class="eyebrow"><span></span> OUR LITTLE SETTINGS</p>
+            <h2>设置</h2>
+          </div>
+          <p>把小房子的样子、名字和未来入口都收在这里。</p>
+        </div>
+
+        <div class="settings-grid">
+          <section class="settings-card appearance-settings" aria-labelledby="appearanceTitle">
+            <div class="settings-card-heading">
+              <div>
+                <p class="card-label">APPEARANCE</p>
+                <h3 id="appearanceTitle">外观</h3>
+              </div>
+              <span aria-hidden="true">✦</span>
+            </div>
+
+            <div class="setting-row">
+              <div><strong>明暗</strong><small>跟着现在的心情切换</small></div>
+              <div class="setting-segmented" aria-label="选择明暗主题">
+                <button id="themeChoiceDark" type="button" data-theme-choice="night" aria-pressed="false">☾ Dark</button>
+                <button id="themeChoiceLight" class="is-active" type="button" data-theme-choice="day" aria-pressed="true">☀ Light</button>
+              </div>
+            </div>
+
+            <div class="setting-style-block">
+              <div class="setting-label"><strong>界面风格</strong><small>之后可以从这里换一整套 UI</small></div>
+              <div class="style-options">
+                <button class="style-option is-active" type="button" aria-pressed="true">
+                  <span class="style-swatch style-swatch-ins">✓</span>
+                  <strong>Ins 风</strong>
+                  <small>正在使用</small>
+                </button>
+                <button class="style-option" type="button" aria-pressed="false" disabled>
+                  <span class="style-swatch style-swatch-vintage">⌁</span>
+                  <strong>复古风</strong>
+                  <small>正在准备</small>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-card project-settings" aria-labelledby="projectTitle">
+            <p class="card-label">PROJECT IDENTITY</p>
+            <h2 class="settings-project-title" id="projectTitle">阿序和书函的实验室</h2>
+            <p>这是小房子现在的名字。以后要重新启用首页大标题，也可以从这里出发。</p>
+            <div class="project-badges"><span>Web App</span><span>Local First</span><span>2026</span></div>
+          </section>
+
+          <section class="settings-card connection-settings" aria-labelledby="connectionTitle">
+            <div class="settings-card-heading">
+              <div>
+                <p class="card-label">FUTURE CONNECTIONS</p>
+                <h3 id="connectionTitle">未来连接</h3>
+              </div>
+              <span aria-hidden="true">∞</span>
+            </div>
+            <div class="connection-list">
+              <div><span>GPT Chat</span><small>安全服务端接入 · 规划中</small><b>›</b></div>
+              <div><span>MCP</span><small>给小房子增加新能力 · 想法中</small><b>›</b></div>
+            </div>
+            <p class="settings-safety-note">这里不会保存或展示任何 API Key。</p>
+          </section>
+
+          <section class="backup-card settings-card" aria-labelledby="backupTitle">
+            <div>
+              <p class="card-label">BACKUP & RESTORE</p>
+              <h3 id="backupTitle">数据小行囊</h3>
+              <p>把便签、日记和记忆一起装进 JSON 文件，换设备或清理浏览器前可以先备份。</p>
+            </div>
+            <div class="backup-actions">
+              <button class="secondary-button" id="exportData" type="button">导出备份 <span>↓</span></button>
+              <button class="secondary-button" id="chooseImport" type="button">导入恢复 <span>↑</span></button>
+              <input id="importFile" type="file" accept="application/json,.json" hidden />
+            </div>
+            <p class="backup-status" id="backupStatus" role="status" aria-live="polite"></p>
+          </section>
+        </div>
+      </section>
     </main>
 
     <footer>
@@ -372,21 +461,21 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.75h14v11.5H9l-4 3v-14.5Z"/><path d="M8 9h8M8 12h5"/></svg>
         <small>Notes</small>
       </button>
-      <button class="bottom-nav-item" type="button" data-target="diary">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h11.5A2.5 2.5 0 0 1 19 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z"/><path d="M8 8h7M8 11h6M5 17a2.5 2.5 0 0 1 2.5-2.5H19"/></svg>
-        <small>Diary</small>
+      <button class="bottom-nav-item" type="button" data-target="memories">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.2-7-9.3A3.9 3.9 0 0 1 12 8.3a3.9 3.9 0 0 1 7 2.4C19 15.8 12 20 12 20Z"/><path d="M9.5 5.5h5"/></svg>
+        <small>Memories</small>
       </button>
       <button class="bottom-nav-item bottom-nav-home is-active" type="button" data-target="home" aria-current="page">
         <span class="nav-home-ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-6.5 8 6.5"/><path d="M6.5 10v9h11v-9M10 19v-5h4v5"/></svg></span>
         <small>Home</small>
       </button>
-      <button class="bottom-nav-item" type="button" data-target="memories">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.2-7-9.3A3.9 3.9 0 0 1 12 8.3a3.9 3.9 0 0 1 7 2.4C19 15.8 12 20 12 20Z"/><path d="M9.5 5.5h5"/></svg>
-        <small>Memories</small>
-      </button>
       <button class="bottom-nav-item" type="button" data-target="chat">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h15v11h-8l-4.5 3v-3H4.5v-11Z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
         <small>Chat</small>
+      </button>
+      <button class="bottom-nav-item" type="button" data-target="settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19 13.5 1.2 1.1-1.8 3.1-1.6-.5a7 7 0 0 1-2.3 1.3l-.4 1.6h-3.6l-.4-1.6a7 7 0 0 1-2.3-1.3l-1.6.5-1.8-3.1 1.2-1.1a7 7 0 0 1 0-2.9L4.4 9.5l1.8-3.1 1.6.5a7 7 0 0 1 2.3-1.3L10.5 4h3.6l.4 1.6a7 7 0 0 1 2.3 1.3l1.6-.5 1.8 3.1-1.2 1.1a7 7 0 0 1 0 2.9Z"/></svg>
+        <small>Settings</small>
       </button>
     </nav>
 
