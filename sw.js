@@ -1,10 +1,11 @@
-const CACHE_NAME = "axu-shuhan-lab-v5";
+const CACHE_NAME = "axu-shuhan-lab-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./script.js",
   "./manifest.webmanifest",
+  "./fonts/noto-serif-sc.css",
   "./icons/lab-icon.svg",
   "./icons/lab-icon-192.png",
   "./icons/lab-icon-512.png",

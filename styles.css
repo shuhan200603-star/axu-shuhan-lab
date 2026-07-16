@@ -15,7 +15,7 @@
   --blue-soft: rgba(164, 218, 255, 0.55);
   --violet-soft: rgba(207, 189, 255, 0.5);
   --shadow: 0 24px 70px rgba(70, 109, 146, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.85);
-  font-family: "Noto Serif SC", "Songti SC", "Microsoft YaHei", serif;
+  font-family: "OurChineseFont", "PingFang SC", serif;
   font-synthesis: none;
 }
 
@@ -2373,7 +2373,7 @@ select:focus-visible,
   --violet: #79639a;
   --violet-soft: #e9e1f1;
   --shadow: 0 18px 48px rgba(70, 53, 76, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  --font-cn: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --font-cn: "OurChineseFont", "PingFang SC", serif;
   --font-en: "Cormorant Garamond", Georgia, serif;
   font-family: var(--font-cn);
 }
@@ -2401,6 +2401,13 @@ body {
   font-family: var(--font-cn);
   font-weight: 400;
   background: var(--bg);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-cn);
 }
 
 .ambient {
@@ -2857,6 +2864,16 @@ h1 em {
   background: var(--rose);
 }
 
+.chat-send-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .chat-composer p {
   margin: 0;
   padding: 0 14px;
@@ -2973,8 +2990,12 @@ select:focus-visible,
   }
 
   .bottom-nav {
-    width: calc(100% - 18px);
+    right: 20px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 20px;
+    width: auto;
     padding-inline: 6px;
+    transform: none;
   }
 
   .bottom-nav-item {
@@ -2998,7 +3019,7 @@ select:focus-visible,
 
   .chat-section {
     min-height: calc(100vh - 170px);
-    padding: 34px 20px;
+    padding: 34px 16px;
     border-radius: 28px;
   }
 
