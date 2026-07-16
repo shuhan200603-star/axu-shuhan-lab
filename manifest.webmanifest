@@ -7,8 +7,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#f5f0ea",
-  "theme_color": "#f5f0ea",
+  "background_color": "#eaf7ff",
+  "theme_color": "#eaf7ff",
   "icons": [
     {
       "src": "icons/lab-icon-192.png",
