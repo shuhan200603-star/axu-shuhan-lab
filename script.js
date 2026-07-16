@@ -69,12 +69,13 @@ const memoryCalendarTitle = document.querySelector("#memoryCalendarTitle");
 const memoryCalendarGrid = document.querySelector("#memoryCalendarGrid");
 const previousMemoryMonth = document.querySelector("#previousMemoryMonth");
 const nextMemoryMonth = document.querySelector("#nextMemoryMonth");
+const timeMilestones = [...document.querySelectorAll(".time-milestone")];
 
 const notesKey = "axu-shuhan-lab-notes";
 const diariesKey = "axu-shuhan-lab-diaries";
 const memoriesKey = "axu-shuhan-lab-memories";
 const backupAppId = "axu-shuhan-lab";
-const validViews = new Set(["home", "notes", "diary", "memories"]);
+const validViews = new Set(["home", "notes", "diary", "memories", "chat"]);
 const memoryCategories = ["心话", "日常", "纪念", "承诺", "愿望"];
 const relationshipConfig = Object.freeze({
   timeZone: "Asia/Shanghai",
@@ -96,6 +97,7 @@ let backupStatusTimer = null;
 let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let memoryCalendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let activeMemoryCategory = "all";
+let milestoneAnimationFrame = null;
 
 const experiments = [
   "把一个小小的想法，认真做成可以看见的东西。",
@@ -215,6 +217,47 @@ function updateRelationshipTime() {
     : `距离 ${metrics.anniversaryYear} 年 7 月 13 日还有 ${metrics.daysToAnniversary} 天`;
 }
 
+function setMilestoneNumber(kind, value) {
+  if (kind === "together") sharedDay.textContent = `Day ${value}`;
+  else if (kind === "vow") vowDay.textContent = `Day ${value}`;
+  else anniversaryCountdown.textContent = `${value} 天`;
+}
+
+function animateMilestone(button) {
+  const kind = button.dataset.milestone;
+  const metrics = relationshipMetrics();
+  setMilestoneNumber("together", metrics.togetherDay);
+  setMilestoneNumber("vow", metrics.vowDay);
+  setMilestoneNumber("anniversary", metrics.daysToAnniversary);
+  const target = kind === "together"
+    ? metrics.togetherDay
+    : kind === "vow"
+      ? metrics.vowDay
+      : metrics.daysToAnniversary;
+
+  timeMilestones.forEach((milestone) => {
+    const isActive = milestone === button;
+    milestone.classList.toggle("is-active", isActive);
+    milestone.setAttribute("aria-pressed", String(isActive));
+  });
+
+  window.cancelAnimationFrame(milestoneAnimationFrame);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setMilestoneNumber(kind, target);
+    return;
+  }
+
+  const startedAt = performance.now();
+  const duration = 620;
+  const tick = (now) => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    const eased = 1 - (1 - progress) ** 3;
+    setMilestoneNumber(kind, Math.round(target * eased));
+    if (progress < 1) milestoneAnimationFrame = window.requestAnimationFrame(tick);
+  };
+  milestoneAnimationFrame = window.requestAnimationFrame(tick);
+}
+
 function localDateValue(date = new Date()) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -283,7 +326,7 @@ function applyTheme(theme) {
   themeIcon.textContent = isNight ? "☀" : "☾";
   themeLabel.textContent = isNight ? "白天" : "夜晚";
   themeToggle.setAttribute("aria-label", `切换${isNight ? "白天" : "夜晚"}主题`);
-  themeColor.content = isNight ? "#141733" : "#eaf7ff";
+  themeColor.content = isNight ? "#211c2a" : "#f8f4f7";
 }
 
 function showView(target, updateLocation = true) {
@@ -977,6 +1020,10 @@ shuffleExperiment.addEventListener("click", () => {
 
 navItems.forEach((item) => {
   item.addEventListener("click", () => showView(item.dataset.target));
+});
+
+timeMilestones.forEach((milestone) => {
+  milestone.addEventListener("click", () => animateMilestone(milestone));
 });
 
 memoryFilters.forEach((filter) => {

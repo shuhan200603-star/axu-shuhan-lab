@@ -1,4 +1,4 @@
-const CACHE_NAME = "axu-shuhan-lab-v4";
+const CACHE_NAME = "axu-shuhan-lab-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,8 @@ const APP_SHELL = [
   "./icons/lab-icon.svg",
   "./icons/lab-icon-192.png",
   "./icons/lab-icon-512.png",
+  "./fonts/CormorantGaramond-SemiBold.woff2",
+  "./fonts/CormorantGaramond-Bold.woff2",
 ];
 
 self.addEventListener("install", (event) => {
