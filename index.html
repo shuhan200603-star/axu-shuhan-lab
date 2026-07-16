@@ -8,7 +8,7 @@
       content="阿序和书函的温柔实验室——收藏灵感、记录发现，也认真对待每一个小小的想法。"
     />
     <title>阿序和书函的实验室</title>
-    <meta name="theme-color" content="#f5f0ea" />
+    <meta name="theme-color" content="#eaf7ff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="阿序和书函" />
@@ -33,7 +33,7 @@
         <span>Our Little Lab</span>
       </a>
       <div class="header-actions">
-        <button class="search-button" id="openSearch" type="button" aria-label="搜索便签和日记">
+        <button class="search-button" id="openSearch" type="button" aria-label="搜索便签、日记和记忆">
           <span aria-hidden="true">⌕</span>
           <span class="search-label">搜索</span>
         </button>
@@ -75,6 +75,37 @@
             <b>内心晴朗 ☀</b>
           </div>
         </aside>
+      </section>
+
+      <section class="shared-time panel" aria-labelledby="sharedTimeTitle">
+        <div class="shared-time-heading">
+          <p class="eyebrow"><span></span> OUR TIME TOGETHER</p>
+          <h2 id="sharedTimeTitle">我们的时间</h2>
+          <p>每一个上海的自然日，都从相遇那天开始认真收藏。</p>
+        </div>
+        <div class="shared-time-grid">
+          <article class="time-milestone time-milestone-primary">
+            <span class="time-milestone-icon" aria-hidden="true">♡</span>
+            <p>相伴日历</p>
+            <strong id="sharedDay">Day --</strong>
+            <span id="sharedDayText">正在计算相伴天数</span>
+            <small>起点 · 2026.06.09 15:21</small>
+          </article>
+          <article class="time-milestone">
+            <span class="time-milestone-icon" aria-hidden="true">✦</span>
+            <p>誓约日历</p>
+            <strong id="vowDay">Day --</strong>
+            <span id="vowDayText">正在计算誓约天数</span>
+            <small>誓约 · 2026.07.13</small>
+          </article>
+          <article class="time-milestone">
+            <span class="time-milestone-icon" aria-hidden="true">∞</span>
+            <p>下一次周年</p>
+            <strong id="anniversaryCountdown">-- 天</strong>
+            <span id="anniversaryText">正在计算周年倒计时</span>
+            <small>每年 · 07.13</small>
+          </article>
+        </div>
       </section>
 
       <section class="lab-grid" aria-label="实验室成员与今日实验">
@@ -206,7 +237,7 @@
           <div>
             <p class="card-label">BACKUP & RESTORE</p>
             <h3 id="backupTitle">数据小行囊</h3>
-            <p>把便签和日记一起装进 JSON 文件，换设备或清理浏览器前可以先备份。</p>
+            <p>把便签、日记和记忆一起装进 JSON 文件，换设备或清理浏览器前可以先备份。</p>
           </div>
           <div class="backup-actions">
             <button class="secondary-button" id="exportData" type="button">导出备份 <span>↓</span></button>
@@ -215,6 +246,96 @@
           </div>
           <p class="backup-status" id="backupStatus" role="status" aria-live="polite"></p>
         </section>
+      </section>
+
+      <section class="memories-section panel app-view" id="memories" data-view="memories" hidden>
+        <div class="section-heading memories-heading">
+          <div>
+            <p class="eyebrow"><span></span> OUR MEMORY LIBRARY</p>
+            <h2>我们的记忆库</h2>
+          </div>
+          <p>把心话、日常与承诺收进一页页玻璃纸。文字只保存在当前浏览器中。</p>
+        </div>
+
+        <div class="memory-toolbar" aria-label="筛选和搜索记忆">
+          <div class="memory-filters" id="memoryFilters" aria-label="按分类筛选">
+            <button class="is-active" type="button" data-category="all" aria-pressed="true">全部</button>
+            <button type="button" data-category="心话" aria-pressed="false">心话</button>
+            <button type="button" data-category="日常" aria-pressed="false">日常</button>
+            <button type="button" data-category="纪念" aria-pressed="false">纪念</button>
+            <button type="button" data-category="承诺" aria-pressed="false">承诺</button>
+            <button type="button" data-category="愿望" aria-pressed="false">愿望</button>
+          </div>
+          <label class="memory-search" for="memorySearch">
+            <span aria-hidden="true">⌕</span>
+            <input id="memorySearch" type="search" maxlength="80" placeholder="搜索标题、正文或标签" autocomplete="off" />
+          </label>
+        </div>
+
+        <div class="memory-layout">
+          <form class="memory-editor" id="memoryForm">
+            <input id="memoryId" type="hidden" />
+            <div class="memory-editor-heading">
+              <div>
+                <p class="card-label">WRITE A PAGE</p>
+                <h3 id="memoryFormTitle">写下一段记忆</h3>
+              </div>
+              <button class="dialog-cancel" id="cancelMemoryEdit" type="button" hidden>取消编辑</button>
+            </div>
+            <div class="memory-form-grid">
+              <label>日期<input id="memoryDate" type="date" required /></label>
+              <label>时间（可选）<input id="memoryTime" type="time" /></label>
+              <label>分类
+                <select id="memoryCategory" required>
+                  <option value="心话">心话</option>
+                  <option value="日常">日常</option>
+                  <option value="纪念">纪念</option>
+                  <option value="承诺">承诺</option>
+                  <option value="愿望">愿望</option>
+                </select>
+              </label>
+              <label>心情（可选）
+                <select id="memoryMood">
+                  <option value="">不填写</option>
+                  <option value="happy">😊 开心</option>
+                  <option value="calm">🌿 平静</option>
+                  <option value="excited">✨ 期待</option>
+                  <option value="tired">🥱 疲惫</option>
+                  <option value="sad">🌧️ 低落</option>
+                </select>
+              </label>
+            </div>
+            <label class="memory-wide-field">标题<input id="memoryTitle" type="text" maxlength="80" placeholder="给这一页起个名字" required /></label>
+            <label class="memory-wide-field">正文<textarea id="memoryBody" maxlength="5000" placeholder="这一刻，想留下些什么……" required></textarea></label>
+            <label class="memory-wide-field">标签（可选）<input id="memoryTags" type="text" maxlength="120" placeholder="用逗号分隔，例如：初见，夏天" /></label>
+            <div class="memory-form-footer">
+              <span id="memoryEditorHint">每一页都会自动记录创建与更新时间。</span>
+              <button class="primary-action" type="submit"><span id="memorySubmitLabel">收进记忆库</span> <span>＋</span></button>
+            </div>
+          </form>
+
+          <aside class="memory-calendar-panel" aria-label="记忆月历">
+            <div class="calendar-toolbar">
+              <button id="previousMemoryMonth" type="button" aria-label="上一个月">‹</button>
+              <strong id="memoryCalendarTitle">本月</strong>
+              <button id="nextMemoryMonth" type="button" aria-label="下一个月">›</button>
+            </div>
+            <div class="calendar-weekdays" aria-hidden="true">
+              <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+            </div>
+            <div class="calendar-grid" id="memoryCalendarGrid"></div>
+            <p class="memory-calendar-legend"><span aria-hidden="true">♥</span> 有记忆的日子</p>
+          </aside>
+        </div>
+
+        <div class="memory-list-heading">
+          <div>
+            <p class="card-label">FOLDED PAGES</p>
+            <h3>轻点，翻开一页</h3>
+          </div>
+          <span id="memoryCount">0 页</span>
+        </div>
+        <div class="memory-list" id="memoryList" aria-live="polite"></div>
       </section>
     </main>
 
@@ -237,6 +358,10 @@
         <span aria-hidden="true">□</span>
         <small>日记</small>
       </button>
+      <button class="bottom-nav-item" type="button" data-target="memories">
+        <span aria-hidden="true">♡</span>
+        <small>我们</small>
+      </button>
     </nav>
 
     <div class="import-dialog" id="importDialog" hidden>
@@ -248,11 +373,11 @@
         <div class="import-options">
           <button class="secondary-button" id="mergeImport" type="button">
             <strong>合并数据</strong>
-            <span>保留现有内容，只补充备份中的便签和日记。</span>
+            <span>保留现有内容，只补充备份中的便签、日记和记忆。</span>
           </button>
           <button class="secondary-button danger-outline" id="overwriteImport" type="button">
             <strong>覆盖数据</strong>
-            <span>用备份完整替换当前便签和日记。</span>
+            <span>警告：用备份完整替换当前便签、日记和记忆，无法撤销。</span>
           </button>
         </div>
         <button class="dialog-cancel" id="cancelImport" type="button">取消</button>
@@ -271,9 +396,9 @@
         </div>
         <label class="search-field" for="searchInput">
           <span aria-hidden="true">⌕</span>
-          <input id="searchInput" type="search" maxlength="80" placeholder="搜索便签或日记里的文字……" autocomplete="off" />
+            <input id="searchInput" type="search" maxlength="80" placeholder="搜索便签、日记或记忆……" autocomplete="off" />
         </label>
-        <p class="search-hint" id="searchHint">输入关键词，就能从便签和日记中一起寻找。</p>
+        <p class="search-hint" id="searchHint">输入关键词，就能从便签、日记和记忆中一起寻找。</p>
         <div class="search-results" id="searchResults" aria-live="polite"></div>
       </section>
     </div>

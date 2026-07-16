@@ -1,4 +1,4 @@
-const CACHE_NAME = "axu-shuhan-lab-v3";
+const CACHE_NAME = "axu-shuhan-lab-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
