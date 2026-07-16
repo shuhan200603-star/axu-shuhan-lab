@@ -3,21 +3,23 @@
   "short_name": "小小实验室",
   "description": "收藏灵感、记录发现，也认真对待每一个小小的想法。",
   "lang": "zh-CN",
-  "start_url": "./",
-  "scope": "./",
+  "dir": "ltr",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f8f4f7",
   "theme_color": "#f8f4f7",
   "icons": [
     {
-      "src": "icons/lab-icon-192.png",
+      "src": "/icons/lab-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/lab-icon-512.png",
+      "src": "/icons/lab-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

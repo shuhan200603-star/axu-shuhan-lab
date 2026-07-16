@@ -2,19 +2,21 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="阿序和书函的温柔实验室——收藏灵感、记录发现，也认真对待每一个小小的想法。"
     />
     <title>阿序和书函的实验室</title>
-    <meta name="theme-color" content="#eaf7ff" />
+    <meta name="theme-color" content="#f8f4f7" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="阿序和书函" />
-    <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" href="icons/lab-icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="icons/lab-icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/lab-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/lab-icon-192.png" sizes="192x192" />
+    <link rel="stylesheet" href="/fonts/noto-serif-sc.css" />
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
   </head>
@@ -352,7 +354,9 @@
         <div class="chat-composer" aria-disabled="true">
           <span aria-hidden="true">＋</span>
           <p>Future chat with Sol…</p>
-          <span aria-hidden="true">↗</span>
+          <span class="chat-send-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg>
+          </span>
         </div>
       </section>
     </main>
