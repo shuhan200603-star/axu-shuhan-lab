@@ -3958,31 +3958,31 @@ select:focus-visible,
    =================================================================== */
 :root[data-skin="vintage"] {
   color-scheme: light;
-  --bg: #ece0c8;
-  --surface: rgba(250, 242, 226, 0.74);
-  --surface-strong: rgba(250, 242, 226, 0.92);
-  --surface-solid: #f6eeda;
-  --text: #3f342a;
-  --muted: #8c7a63;
-  --line: rgba(94, 71, 46, 0.18);
-  --line-soft: rgba(94, 71, 46, 0.1);
-  --rose: #b45b3e;
-  --rose-soft: #ecd6c0;
-  --sage: #7d7a48;
-  --sage-soft: #dcd9b4;
-  --blue-soft: #e6dcc2;
-  --violet: #a2542f;
-  --violet-soft: #e7d4bd;
-  --shadow: 0 18px 44px rgba(88, 60, 34, 0.16), inset 0 1px 0 rgba(255, 250, 238, 0.7);
+  --bg: #d3bd98;
+  --surface: rgba(243, 230, 205, 0.82);
+  --surface-strong: rgba(246, 234, 210, 0.95);
+  --surface-solid: #f1e5c9;
+  --text: #2e2116;
+  --muted: #6f5940;
+  --line: rgba(74, 50, 26, 0.3);
+  --line-soft: rgba(74, 50, 26, 0.16);
+  --rose: #943f22;
+  --rose-soft: #e0c19a;
+  --sage: #5f5e2e;
+  --sage-soft: #cdc794;
+  --blue-soft: #d2c096;
+  --violet: #83380f;
+  --violet-soft: #dabd91;
+  --shadow: 0 20px 48px rgba(62, 38, 14, 0.3), inset 0 1px 0 rgba(255, 248, 230, 0.6);
   --font-en: "Cormorant Garamond", Georgia, var(--font-cn);
 }
 
 :root[data-skin="vintage"][data-theme="night"] {
   color-scheme: dark;
-  --bg: #241d16;
-  --surface: rgba(53, 43, 32, 0.84);
-  --surface-strong: rgba(62, 50, 37, 0.95);
-  --surface-solid: #382d21;
+  --bg: #1d150d;
+  --surface: rgba(48, 37, 26, 0.86);
+  --surface-strong: rgba(58, 45, 31, 0.96);
+  --surface-solid: #332818;
   --text: #f3e7d3;
   --muted: #bda98d;
   --line: rgba(240, 222, 194, 0.16);
@@ -3997,11 +3997,12 @@ select:focus-visible,
   --shadow: 0 22px 54px rgba(10, 6, 2, 0.4), inset 0 1px 0 rgba(255, 240, 214, 0.08);
 }
 
-/* 旧纸质感：暖色晕影 + 细颗粒噪点，固定在视口上 */
+/* 旧纸质感：暖色晕影 + 深角 + 细颗粒噪点，固定在视口上 */
 :root[data-skin="vintage"] body {
   background:
-    radial-gradient(circle at 18% 12%, rgba(210, 168, 110, 0.28), transparent 42%),
-    radial-gradient(circle at 84% 88%, rgba(150, 110, 70, 0.24), transparent 46%),
+    radial-gradient(circle at 18% 12%, rgba(196, 144, 78, 0.4), transparent 44%),
+    radial-gradient(circle at 84% 88%, rgba(112, 72, 34, 0.38), transparent 48%),
+    radial-gradient(circle at 50% 50%, transparent 52%, rgba(72, 44, 16, 0.3) 100%),
     var(--bg);
 }
 
@@ -4011,7 +4012,7 @@ select:focus-visible,
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.055;
+  opacity: 0.085;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -4052,6 +4053,17 @@ select:focus-visible,
 
 :root[data-skin="vintage"] .style-swatch-ins {
   background: #b4a488;
+}
+
+/* 今日实验：从紫檀换成深咖旧书房色 */
+:root[data-skin="vintage"] .experiment-card {
+  color: #f5e9d2;
+  background: #33231a;
+  box-shadow: 0 20px 46px rgba(40, 24, 10, 0.32);
+}
+
+:root[data-skin="vintage"] .experiment-card .card-label {
+  color: #c3a074;
 }
 
 /* 伙伴头像跟着复古调色板走：序=暖锈色、函=橄榄色，明暗自动适配 */
@@ -4131,12 +4143,12 @@ select:focus-visible,
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='%23d9a2ae' fill-opacity='0.42'%3E%3Cg transform='translate(58,54)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3Ccircle r='2.8' fill='%23c9838f'/%3E%3C/g%3E%3Cg transform='translate(182,148) scale(0.76) rotate(24)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3Ccircle r='2.8' fill='%23c9838f'/%3E%3C/g%3E%3Cg transform='translate(96,204) scale(0.52) rotate(-18)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3C/g%3E%3Cellipse cx='152' cy='36' rx='3.4' ry='5.6' transform='rotate(28 152 36)'/%3E%3Cellipse cx='26' cy='150' rx='3' ry='4.8' transform='rotate(-40 26 150)'/%3E%3Cellipse cx='216' cy='224' rx='2.6' ry='4.2' transform='rotate(52 216 224)'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.85;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='%23cf8d9c' fill-opacity='0.5'%3E%3Cg transform='translate(58,54)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3Ccircle r='2.8' fill='%23c9838f'/%3E%3C/g%3E%3Cg transform='translate(182,148) scale(0.76) rotate(24)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3Ccircle r='2.8' fill='%23c9838f'/%3E%3C/g%3E%3Cg transform='translate(96,204) scale(0.52) rotate(-18)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3C/g%3E%3Cellipse cx='152' cy='36' rx='3.4' ry='5.6' transform='rotate(28 152 36)'/%3E%3Cellipse cx='26' cy='150' rx='3' ry='4.8' transform='rotate(-40 26 150)'/%3E%3Cellipse cx='216' cy='224' rx='2.6' ry='4.2' transform='rotate(52 216 224)'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 :root[data-skin="silk"][data-theme="night"] body::before {
-  opacity: 0.14;
+  opacity: 0.22;
   mix-blend-mode: screen;
 }
 
@@ -4492,4 +4504,225 @@ select:focus-visible,
   #homeView .shared-time-heading h2 {
     font-size: 22px;
   }
+}
+
+/* ===================================================================
+   夜话 · Live chat
+   =================================================================== */
+.chat-section.chat-live {
+  display: flex;
+  min-height: min(680px, calc(100dvh - 190px));
+  align-items: stretch;
+  align-content: stretch;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+  place-items: stretch;
+}
+
+.chat-live .chat-intro {
+  max-width: none;
+}
+
+.chat-live .chat-intro .eyebrow {
+  justify-content: flex-start;
+}
+
+.chat-live .chat-intro h2 {
+  margin: 8px 0 4px;
+  font-size: 24px;
+}
+
+.chat-intro-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.chat-log {
+  display: flex;
+  overflow-y: auto;
+  min-height: 220px;
+  padding: 4px 2px;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+
+.chat-empty {
+  margin: auto;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.chat-msg {
+  max-width: 84%;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.chat-msg p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-msg-user {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--rose-soft);
+}
+
+.chat-msg-ai {
+  align-self: flex-start;
+  border-bottom-left-radius: 6px;
+  background: var(--surface-strong);
+}
+
+.chat-msg-ai.is-typing p {
+  color: var(--muted);
+  animation: chat-typing 1.2s ease-in-out infinite;
+}
+
+@keyframes chat-typing {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.chat-msg-error {
+  align-self: center;
+  max-width: 92%;
+  border: 1px dashed var(--line);
+  background: transparent;
+}
+
+.chat-msg-error p {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.chat-composer-live {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.chat-composer-live textarea {
+  min-height: 46px;
+  max-height: 120px;
+  padding: 12px 16px;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface-strong);
+  flex: 1;
+  font-family: var(--font-cn);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.chat-composer-live textarea:focus {
+  border-color: var(--violet);
+  outline: none;
+}
+
+.chat-send-button {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  cursor: pointer;
+  color: #fff;
+  border: 0;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.chat-send-button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.chat-send-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chat-tools {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.chat-tools button {
+  padding: 4px 10px;
+  cursor: pointer;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+/* 陈设里的钥匙输入 */
+.connection-list > .connection-key {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.key-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.key-input-row input {
+  min-width: 0;
+  padding: 9px 13px;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-strong);
+  flex: 1;
+  font-size: 13px;
+}
+
+.key-input-row input:focus {
+  border-color: var(--violet);
+  outline: none;
+}
+
+.key-input-row button {
+  padding: 8px 14px;
+  cursor: pointer;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-strong);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.key-status {
+  color: var(--muted);
+  font-size: 11px;
 }

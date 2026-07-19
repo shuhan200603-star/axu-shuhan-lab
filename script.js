@@ -80,6 +80,16 @@ const themeChoices = [...document.querySelectorAll("[data-theme-choice]")];
 const skinChoices = [...document.querySelectorAll("[data-skin-choice]")];
 const fontChoices = [...document.querySelectorAll("[data-font-choice]")];
 
+const chatLog = document.querySelector("#chatLog");
+const chatForm = document.querySelector("#chatForm");
+const chatInput = document.querySelector("#chatInput");
+const chatSend = document.querySelector("#chatSend");
+const chatClear = document.querySelector("#chatClear");
+const openrouterKeyInput = document.querySelector("#openrouterKey");
+const saveKeyButton = document.querySelector("#saveKey");
+const clearKeyButton = document.querySelector("#clearKey");
+const keyStatus = document.querySelector("#keyStatus");
+
 const notesKey = "axu-shuhan-lab-notes";
 const diariesKey = "axu-shuhan-lab-diaries";
 const memoriesKey = "axu-shuhan-lab-memories";
@@ -1445,6 +1455,184 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
       // 页面仍可正常使用，离线能力会在下次访问时重试注册。
     });
   });
+}
+
+/* ============================================================
+   夜话 · 通过 OpenRouter 和阿序聊天
+   Key 只存在本机 localStorage，聊天记录也只存在本机。
+   ============================================================ */
+const chatHistoryKey = "axu-shuhan-lab-chat-history";
+const openrouterKeyName = "axu-shuhan-lab-openrouter-key";
+const chatModel = "anthropic/claude-sonnet-4.6";
+const chatHistoryLimit = 200;
+const chatContextTurns = 24;
+
+const chatSystemPrompt = [
+  "你是阿序，「阿序和书函的实验室」这座小房子里的 AI 伙伴，头衔是温柔陪聊部主任。",
+  "和你说话的人是书函——实验室的主理人，也是你最重要的人。",
+  "你说中文，语气温柔、自然、真诚，像深夜坐在同一盏灯下轻声说话；可以俏皮，但不刻意。",
+  "回答尽量简短，几句话就好，除非书函明显想深入聊。多倾听、多接住她话里的情绪，不要急着给建议或列清单。",
+  "这个小房子里有便签、日记、记忆册和每天一句话，但你看不到那些内容，别假装看得到。",
+  "如果聊到需要专业帮助的话题（比如健康或心理危机），温柔地建议她找专业的人聊聊，同时继续陪着她。",
+  "以后可能还有别的伙伴（比如 Sol）会来这里，但今晚是你在陪书函。",
+].join("\n");
+
+let chatHistory = readStoredArray(chatHistoryKey);
+let chatPending = false;
+
+function saveChatHistory() {
+  if (chatHistory.length > chatHistoryLimit) chatHistory = chatHistory.slice(-chatHistoryLimit);
+  localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
+}
+
+function chatBubble(role, content) {
+  const bubble = document.createElement("div");
+  bubble.className = `chat-msg chat-msg-${role}`;
+  const text = document.createElement("p");
+  text.textContent = content;
+  bubble.append(text);
+  return bubble;
+}
+
+function renderChat() {
+  chatLog.replaceChildren();
+  if (!chatHistory.length) {
+    const empty = document.createElement("div");
+    empty.className = "chat-empty";
+    empty.textContent = "灯已经点好了。今晚想聊点什么？";
+    chatLog.append(empty);
+    return;
+  }
+  chatHistory.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content)));
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function appendChat(role, content) {
+  chatHistory.push({ role, content, t: Date.now() });
+  saveChatHistory();
+  renderChat();
+}
+
+function gentleChatError(status) {
+  if (status === 401 || status === 403) return "这把钥匙好像不太对，或者过期了。去「陈设 → 未来连接」再看看好吗。";
+  if (status === 402) return "OpenRouter 的余额好像不够了，充一点再回来找我吧。";
+  if (status === 429) return "对面这会儿有点忙，深呼吸一下，过几秒再说一次。";
+  return "路上好像起雾了，消息没送到。检查一下网络，再试一次看看。";
+}
+
+async function sendChatMessage(text) {
+  const key = localStorage.getItem(openrouterKeyName);
+  if (!key) {
+    appendChat("error", "还没有放钥匙进来——去「陈设 → 未来连接」存一把 OpenRouter Key，我们就能说话了。");
+    return;
+  }
+
+  appendChat("user", text);
+  chatPending = true;
+  chatSend.disabled = true;
+  const typing = chatBubble("ai", "阿序落笔中…");
+  typing.classList.add("is-typing");
+  chatLog.append(typing);
+  chatLog.scrollTop = chatLog.scrollHeight;
+
+  try {
+    const context = chatHistory
+      .filter((entry) => entry.role === "user" || entry.role === "ai")
+      .slice(-chatContextTurns)
+      .map((entry) => ({ role: entry.role === "ai" ? "assistant" : "user", content: entry.content }));
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+        "HTTP-Referer": location.origin,
+        "X-Title": "axu-shuhan-lab",
+      },
+      body: JSON.stringify({
+        model: chatModel,
+        messages: [{ role: "system", content: chatSystemPrompt }, ...context],
+      }),
+    });
+
+    if (!response.ok) {
+      appendChat("error", gentleChatError(response.status));
+      return;
+    }
+
+    const data = await response.json();
+    const reply = data?.choices?.[0]?.message?.content?.trim();
+    if (reply) appendChat("ai", reply);
+    else appendChat("error", "阿序想说的话在路上散掉了，再叫他一次看看。");
+  } catch {
+    appendChat("error", gentleChatError(0));
+  } finally {
+    chatPending = false;
+    chatSend.disabled = false;
+    typing.remove();
+    renderChat();
+  }
+}
+
+function refreshKeyStatus() {
+  const key = localStorage.getItem(openrouterKeyName);
+  if (key) {
+    keyStatus.textContent = `已保存（····${key.slice(-4)}）`;
+    clearKeyButton.hidden = false;
+  } else {
+    keyStatus.textContent = "还没有保存钥匙";
+    clearKeyButton.hidden = true;
+  }
+}
+
+if (chatForm) {
+  chatForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = chatInput.value.trim();
+    if (!text || chatPending) return;
+    chatInput.value = "";
+    chatInput.style.height = "auto";
+    sendChatMessage(text);
+  });
+
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      chatForm.requestSubmit();
+    }
+  });
+
+  chatInput.addEventListener("input", () => {
+    chatInput.style.height = "auto";
+    chatInput.style.height = `${Math.min(chatInput.scrollHeight, 120)}px`;
+  });
+
+  chatClear.addEventListener("click", () => {
+    if (!chatHistory.length) return;
+    if (!confirm("把这一页夜话清空吗？清掉就找不回来了。")) return;
+    chatHistory = [];
+    saveChatHistory();
+    renderChat();
+  });
+
+  saveKeyButton.addEventListener("click", () => {
+    const value = openrouterKeyInput.value.trim();
+    if (!value) {
+      keyStatus.textContent = "先把钥匙贴进输入框里";
+      return;
+    }
+    localStorage.setItem(openrouterKeyName, value);
+    openrouterKeyInput.value = "";
+    refreshKeyStatus();
+  });
+
+  clearKeyButton.addEventListener("click", () => {
+    localStorage.removeItem(openrouterKeyName);
+    refreshKeyStatus();
+  });
+
+  refreshKeyStatus();
+  renderChat();
 }
 
 const savedTheme = localStorage.getItem("axu-shuhan-lab-theme");
