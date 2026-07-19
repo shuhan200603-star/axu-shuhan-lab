@@ -2374,7 +2374,7 @@ select:focus-visible,
   --violet-soft: #e9e1f1;
   --shadow: 0 18px 48px rgba(70, 53, 76, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.92);
   --font-cn: "OurChineseFont", "PingFang SC", serif;
-  --font-en: "Cormorant Garamond", Georgia, serif;
+  --font-en: "Cormorant Garamond", Georgia, var(--font-cn);
   font-family: var(--font-cn);
 }
 
@@ -3193,6 +3193,7 @@ select:focus-visible,
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--violet-soft);
+  align-self: stretch;
   align-items: stretch;
   justify-content: flex-start;
   flex-direction: column;
@@ -3494,9 +3495,9 @@ select:focus-visible,
 
 .style-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 14px;
-  gap: 12px;
+  gap: 10px;
 }
 
 .style-option {
@@ -3537,6 +3538,11 @@ select:focus-visible,
 .style-swatch-vintage {
   color: #715b50;
   background: #d8c1aa;
+}
+
+.style-swatch-silk {
+  color: #a85062;
+  background: linear-gradient(150deg, #f9e4e8, #eec3cc);
 }
 
 .settings-project-title {
@@ -3630,23 +3636,28 @@ select:focus-visible,
 }
 
 .bottom-nav-home {
-  transform: translateY(-8px);
+  transform: translateY(-9px);
 }
 
 .bottom-nav-home:hover {
-  transform: translateY(-10px);
+  transform: translateY(-11px);
+}
+
+/* Home 圈占满导航条高度并从顶部微微出头，文字标签收起 */
+.bottom-nav-home small {
+  display: none;
 }
 
 .nav-home-ring {
-  width: 44px;
-  height: 44px;
+  width: 58px;
+  height: 58px;
   border-width: 4px;
   box-shadow: 0 8px 18px rgba(89, 65, 111, 0.22);
 }
 
 .nav-home-ring svg {
-  width: 19px;
-  height: 19px;
+  width: 24px;
+  height: 24px;
 }
 
 .chat-composer {
@@ -3963,7 +3974,7 @@ select:focus-visible,
   --violet: #a2542f;
   --violet-soft: #e7d4bd;
   --shadow: 0 18px 44px rgba(88, 60, 34, 0.16), inset 0 1px 0 rgba(255, 250, 238, 0.7);
-  --font-en: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-en: "Cormorant Garamond", Georgia, var(--font-cn);
 }
 
 :root[data-skin="vintage"][data-theme="night"] {
@@ -4065,6 +4076,163 @@ select:focus-visible,
 }
 
 /* ===================================================================
+   新中式 · Silk skin
+   极淡粉白底、若隐若现的花瓣底纹、胭脂与黛青点缀，
+   卡片留白更从容。通过 <html data-skin="silk"> 启用。
+   =================================================================== */
+:root[data-skin="silk"] {
+  color-scheme: light;
+  --bg: #faf4f4;
+  --surface: rgba(255, 252, 252, 0.78);
+  --surface-strong: rgba(255, 253, 253, 0.94);
+  --surface-solid: #fffbfb;
+  --text: #43383c;
+  --muted: #947f86;
+  --line: rgba(171, 113, 124, 0.2);
+  --line-soft: rgba(171, 113, 124, 0.11);
+  --rose: #b35b6b;
+  --rose-soft: #f6e3e6;
+  --sage: #5d7668;
+  --sage-soft: #e3ece5;
+  --blue-soft: #f2e9eb;
+  --violet: #a05467;
+  --violet-soft: #f3e0e4;
+  --shadow: 0 14px 40px rgba(150, 100, 110, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+:root[data-skin="silk"][data-theme="night"] {
+  color-scheme: dark;
+  --bg: #251d20;
+  --surface: rgba(58, 46, 50, 0.85);
+  --surface-strong: rgba(66, 52, 57, 0.95);
+  --surface-solid: #3a2e33;
+  --text: #f6ecee;
+  --muted: #c3adb2;
+  --line: rgba(244, 218, 224, 0.16);
+  --line-soft: rgba(244, 218, 224, 0.09);
+  --rose: #e59aaa;
+  --rose-soft: #4c3238;
+  --sage: #a9c4b1;
+  --sage-soft: #35413a;
+  --blue-soft: #382c30;
+  --violet: #dfa3b0;
+  --violet-soft: #47323a;
+  --shadow: 0 20px 50px rgba(10, 5, 8, 0.38), inset 0 1px 0 rgba(255, 240, 244, 0.08);
+}
+
+:root[data-skin="silk"] body {
+  background: var(--bg);
+}
+
+/* 花瓣底纹：三簇五瓣小花与零星花瓣，随视口固定、若隐若现 */
+:root[data-skin="silk"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='%23d9a2ae' fill-opacity='0.42'%3E%3Cg transform='translate(58,54)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3Ccircle r='2.8' fill='%23c9838f'/%3E%3C/g%3E%3Cg transform='translate(182,148) scale(0.76) rotate(24)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3Ccircle r='2.8' fill='%23c9838f'/%3E%3C/g%3E%3Cg transform='translate(96,204) scale(0.52) rotate(-18)'%3E%3Cellipse cy='-13' rx='7' ry='11'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(72)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(144)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(216)'/%3E%3Cellipse cy='-13' rx='7' ry='11' transform='rotate(288)'/%3E%3C/g%3E%3Cellipse cx='152' cy='36' rx='3.4' ry='5.6' transform='rotate(28 152 36)'/%3E%3Cellipse cx='26' cy='150' rx='3' ry='4.8' transform='rotate(-40 26 150)'/%3E%3Cellipse cx='216' cy='224' rx='2.6' ry='4.2' transform='rotate(52 216 224)'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-skin="silk"][data-theme="night"] body::before {
+  opacity: 0.14;
+  mix-blend-mode: screen;
+}
+
+/* 素雅的卡片：细描边、浅阴影、更实的纸面 */
+:root[data-skin="silk"] .panel,
+:root[data-skin="silk"] .theme-toggle,
+:root[data-skin="silk"] .search-button,
+:root[data-skin="silk"] .note-form,
+:root[data-skin="silk"] .diary-editor,
+:root[data-skin="silk"] .diary-list-panel,
+:root[data-skin="silk"] .backup-card,
+:root[data-skin="silk"] .memory-editor,
+:root[data-skin="silk"] .memory-calendar-panel,
+:root[data-skin="silk"] .bottom-nav,
+:root[data-skin="silk"] .import-dialog-card,
+:root[data-skin="silk"] .search-dialog-card {
+  backdrop-filter: blur(8px) saturate(105%);
+  -webkit-backdrop-filter: blur(8px) saturate(105%);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow);
+}
+
+:root[data-skin="silk"] .panel {
+  border-color: var(--line);
+}
+
+/* 标题稍稍拉开字距，多一分从容 */
+:root[data-skin="silk"] .section-heading h2,
+:root[data-skin="silk"] .settings-project-title,
+:root[data-skin="silk"] .daily-message-header h2 {
+  letter-spacing: 0.14em;
+}
+
+/* 留白更宽绰（压过手机紧凑规则） */
+:root[data-skin="silk"] .notes-section,
+:root[data-skin="silk"] .diary-section,
+:root[data-skin="silk"] .memories-section,
+:root[data-skin="silk"] .chat-section,
+:root[data-skin="silk"] .settings-section {
+  padding: 26px 18px;
+}
+
+:root[data-skin="silk"] .settings-card {
+  padding: 22px 18px;
+}
+
+:root[data-skin="silk"] .settings-grid {
+  gap: 14px;
+}
+
+:root[data-skin="silk"] .setting-row,
+:root[data-skin="silk"] .setting-style-block {
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+:root[data-skin="silk"] .daily-message-widget {
+  padding: 20px;
+}
+
+:root[data-skin="silk"] .clock-card.home-widget,
+:root[data-skin="silk"] .experiment-card.home-widget {
+  padding: 18px;
+}
+
+:root[data-skin="silk"] #homeView .member-card {
+  padding: 18px;
+}
+
+:root[data-skin="silk"] #homeView .shared-time {
+  padding: 17px;
+}
+
+/* 伙伴头像：序=胭脂、函=黛青 */
+:root[data-skin="silk"] .avatar-axu {
+  color: var(--rose);
+  background: var(--rose-soft);
+}
+
+:root[data-skin="silk"] .avatar-shuhan {
+  color: var(--sage);
+  background: var(--sage-soft);
+}
+
+/* 今日实验换成胭脂木色的深调 */
+:root[data-skin="silk"] .experiment-card {
+  color: #fbf1f3;
+  background: #463038;
+  box-shadow: 0 18px 44px rgba(70, 48, 56, 0.24);
+}
+
+:root[data-skin="silk"] .experiment-card .card-label {
+  color: #d8b3ba;
+}
+
+/* ===================================================================
    字体切换 · Font choices
    宋 = 自托管 Noto Serif SC（默认），楷 = 自托管霞鹜文楷，
    黑 = 系统无衬线（苹方/雅黑，零下载）。全部本地字体，iPhone 安全。
@@ -4074,7 +4242,8 @@ select:focus-visible,
 }
 
 :root[data-font="hei"] {
-  --font-cn: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-cn: "OurHeiFont", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-synthesis: weight;
 }
 
 .font-options {
@@ -4123,8 +4292,7 @@ select:focus-visible,
 }
 
 .font-option-hei strong {
-  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-weight: 600;
+  font-family: "OurHeiFont", "PingFang SC", "Hiragino Sans GB", sans-serif;
 }
 
 /* ===================================================================

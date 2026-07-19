@@ -409,11 +409,16 @@ function updateClock() {
 }
 
 const skinKey = "axu-shuhan-lab-skin";
-const validSkins = new Set(["ins", "vintage"]);
+const validSkins = new Set(["ins", "vintage", "silk"]);
 
 const themeColors = {
   ins: { day: "#f8f4f7", night: "#211c2a" },
   vintage: { day: "#ece0c8", night: "#241d16" },
+  silk: { day: "#faf4f4", night: "#251d20" },
+};
+
+const skinNavLabels = {
+  silk: { notes: "手记", memories: "旧时", home: "归处", chat: "夜话", settings: "陈设" },
 };
 
 function currentSkin() {
@@ -449,6 +454,13 @@ function applySkin(skin) {
     choice.setAttribute("aria-pressed", String(isActive));
     const state = choice.querySelector("[data-skin-state]");
     if (state) state.textContent = isActive ? "正在使用" : "点此启用";
+  });
+  const navLabels = skinNavLabels[nextSkin];
+  navItems.forEach((item) => {
+    const label = item.querySelector("small");
+    if (!label) return;
+    if (!label.dataset.defaultLabel) label.dataset.defaultLabel = label.textContent;
+    label.textContent = (navLabels && navLabels[item.dataset.target]) || label.dataset.defaultLabel;
   });
   updateThemeColor();
 }
