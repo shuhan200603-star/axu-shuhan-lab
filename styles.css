@@ -3013,8 +3013,9 @@ select:focus-visible,
   }
 
   .nav-home-ring {
-    width: 52px;
-    height: 52px;
+    width: 58px;
+    height: 58px;
+    margin-top: -11px;
   }
 
   .chat-section {
@@ -3636,25 +3637,25 @@ select:focus-visible,
 }
 
 .bottom-nav-home {
-  transform: translateY(-2px);
+  transform: translateY(0);
 }
 
 .bottom-nav-home:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
 }
 
-/* 大 Home 圈：向上探出导航条，下面保留文字标签 */
+/* 大 Home 圈：只从导航条上沿探出约 1/10，下面保留文字标签 */
 .bottom-nav-home small {
   display: block;
   margin-top: -3px;
 }
 
 .nav-home-ring {
-  width: 66px;
-  height: 66px;
-  margin-top: -30px;
+  width: 60px;
+  height: 60px;
+  margin-top: -14px;
   border-width: 4px;
-  box-shadow: 0 10px 22px rgba(89, 65, 111, 0.26);
+  box-shadow: 0 8px 18px rgba(89, 65, 111, 0.24);
 }
 
 .nav-home-ring svg {
@@ -3920,9 +3921,10 @@ select:focus-visible,
   }
 
   .nav-home-ring {
-    width: 34px;
-    height: 34px;
-    border-width: 3px;
+    width: 58px;
+    height: 58px;
+    margin-top: -11px;
+    border-width: 4px;
   }
 
   .chat-section {
@@ -4735,4 +4737,14 @@ select:focus-visible,
   pointer-events: none;
   visibility: hidden;
   transition: opacity 160ms ease;
+}
+
+/* iOS 聚焦字号小于 16px 的输入框时会自动放大整页并停住，
+   造成界面看起来“错位/突出”。手机上统一提到 16px 以关掉该行为。 */
+@media (max-width: 720px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
