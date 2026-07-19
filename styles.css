@@ -1150,7 +1150,7 @@ h1 em {
 .search-dialog-card {
   position: relative;
   width: min(640px, 100%);
-  max-height: min(720px, calc(100vh - 40px));
+  max-height: min(720px, calc(100dvh - 40px));
   padding: 30px;
   overflow: auto;
   border-radius: 30px;
@@ -1478,7 +1478,7 @@ button:hover,
   }
 
   .search-dialog-card {
-    max-height: min(760px, calc(100vh - 20px - env(safe-area-inset-bottom, 0px)));
+    max-height: min(760px, calc(100dvh - 20px - env(safe-area-inset-bottom, 0px)));
     padding: 26px 22px;
     border-radius: 26px;
   }
@@ -2765,7 +2765,7 @@ h1 em {
 
 .chat-section {
   display: grid;
-  min-height: min(680px, calc(100vh - 210px));
+  min-height: min(680px, calc(100dvh - 210px));
   margin-top: 24px;
   padding: clamp(34px, 7vw, 72px);
   overflow: hidden;
@@ -3018,7 +3018,7 @@ select:focus-visible,
   }
 
   .chat-section {
-    min-height: calc(100vh - 170px);
+    min-height: calc(100dvh - 170px);
     padding: 34px 16px;
     border-radius: 28px;
   }
@@ -3636,23 +3636,25 @@ select:focus-visible,
 }
 
 .bottom-nav-home {
-  transform: translateY(-9px);
+  transform: translateY(-2px);
 }
 
 .bottom-nav-home:hover {
-  transform: translateY(-11px);
+  transform: translateY(-4px);
 }
 
-/* Home 圈占满导航条高度并从顶部微微出头，文字标签收起 */
+/* 大 Home 圈：向上探出导航条，下面保留文字标签 */
 .bottom-nav-home small {
-  display: none;
+  display: block;
+  margin-top: -3px;
 }
 
 .nav-home-ring {
-  width: 58px;
-  height: 58px;
+  width: 66px;
+  height: 66px;
+  margin-top: -30px;
   border-width: 4px;
-  box-shadow: 0 8px 18px rgba(89, 65, 111, 0.22);
+  box-shadow: 0 10px 22px rgba(89, 65, 111, 0.26);
 }
 
 .nav-home-ring svg {
@@ -3924,7 +3926,7 @@ select:focus-visible,
   }
 
   .chat-section {
-    min-height: calc(100vh - 150px);
+    min-height: calc(100dvh - 150px);
     padding: 26px 16px;
   }
 
@@ -4725,4 +4727,12 @@ select:focus-visible,
 .key-status {
   color: var(--muted);
   font-size: 11px;
+}
+
+/* 键盘弹出时把悬浮导航收起来，避免在 iOS 上飘到页面中间 */
+.keyboard-open .bottom-nav {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 160ms ease;
 }

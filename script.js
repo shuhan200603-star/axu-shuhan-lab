@@ -472,6 +472,8 @@ function applySkin(skin) {
     if (!label.dataset.defaultLabel) label.dataset.defaultLabel = label.textContent;
     label.textContent = (navLabels && navLabels[item.dataset.target]) || label.dataset.defaultLabel;
   });
+  const chatTitle = document.querySelector("#chatTitle");
+  if (chatTitle) chatTitle.textContent = nextSkin === "silk" ? "夜话" : "Chat";
   updateThemeColor();
 }
 
@@ -1633,6 +1635,23 @@ if (chatForm) {
 
   refreshKeyStatus();
   renderChat();
+
+  chatInput.addEventListener("focus", () => {
+    setTimeout(() => {
+      chatForm.scrollIntoView({ block: "end", behavior: "smooth" });
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }, 300);
+  });
+}
+
+// iOS 键盘弹出时视口变矮，固定定位的底部导航会飘到页面中间；
+// 用 visualViewport 侦测键盘，弹出期间先把导航收起来。
+if (window.visualViewport) {
+  const handleViewportResize = () => {
+    const keyboardOpen = window.innerHeight - window.visualViewport.height > 150;
+    document.documentElement.classList.toggle("keyboard-open", keyboardOpen);
+  };
+  window.visualViewport.addEventListener("resize", handleViewportResize);
 }
 
 const savedTheme = localStorage.getItem("axu-shuhan-lab-theme");
