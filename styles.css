@@ -4063,3 +4063,265 @@ select:focus-visible,
 :root[data-skin="vintage"] .daily-message-actions button.is-active {
   border-color: rgba(162, 84, 47, 0.34);
 }
+
+/* ===================================================================
+   字体切换 · Font choices
+   宋 = 自托管 Noto Serif SC（默认），楷 = 自托管霞鹜文楷，
+   黑 = 系统无衬线（苹方/雅黑，零下载）。全部本地字体，iPhone 安全。
+   =================================================================== */
+:root[data-font="kai"] {
+  --font-cn: "OurKaiFont", "Kaiti SC", "STKaiti", "KaiTi", serif;
+}
+
+:root[data-font="hei"] {
+  --font-cn: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+
+.font-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+  gap: 10px;
+}
+
+.font-option {
+  display: grid;
+  min-height: 82px;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: transparent;
+  place-items: center;
+  gap: 3px;
+}
+
+.font-option.is-active {
+  border-color: var(--violet);
+  box-shadow: inset 0 0 0 1px var(--violet);
+}
+
+.font-option strong {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.font-option small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.font-option-song strong {
+  font-family: "OurChineseFont", "PingFang SC", serif;
+}
+
+.font-option-kai strong {
+  font-family: "OurKaiFont", "Kaiti SC", "STKaiti", serif;
+}
+
+.font-option-hei strong {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-weight: 600;
+}
+
+/* ===================================================================
+   紧凑化 · Compact mobile layout
+   手机上收紧内边距和标题字号，一屏能装下更多内容。
+   =================================================================== */
+@media (max-width: 720px) {
+  .site-header {
+    height: 68px;
+  }
+
+  .notes-section,
+  .diary-section,
+  .memories-section,
+  .chat-section,
+  .settings-section {
+    margin-top: 14px;
+    padding: 18px 14px;
+    border-radius: 24px;
+  }
+
+  .section-heading {
+    gap: 10px;
+  }
+
+  .section-heading h2 {
+    margin-top: 6px;
+    font-size: 23px;
+  }
+
+  .section-heading > p {
+    margin: 0 0 2px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .settings-grid {
+    margin-top: 14px;
+    gap: 10px;
+  }
+
+  .settings-card {
+    padding: 15px 14px;
+    border-radius: 18px;
+  }
+
+  .settings-card-heading h3,
+  .settings-card h3 {
+    margin: 3px 0 0;
+    font-size: 17px;
+  }
+
+  .settings-card-heading > span {
+    font-size: 16px;
+  }
+
+  .setting-row,
+  .setting-style-block {
+    margin-top: 13px;
+    padding-top: 11px;
+  }
+
+  .setting-segmented button {
+    min-height: 38px;
+  }
+
+  .style-options {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .style-option {
+    min-height: 86px;
+    padding: 9px;
+    border-radius: 15px;
+  }
+
+  .style-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .font-options {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .font-option {
+    min-height: 64px;
+    padding: 7px;
+    border-radius: 14px;
+  }
+
+  .font-option strong {
+    font-size: 21px;
+  }
+
+  .settings-project-title {
+    margin: 8px 0 7px;
+    font-size: 20px;
+  }
+
+  .project-badges {
+    gap: 6px;
+  }
+
+  .connection-list {
+    margin-top: 11px;
+    gap: 7px;
+  }
+
+  .connection-list > div {
+    padding: 9px 11px;
+    border-radius: 12px;
+  }
+
+  .settings-safety-note {
+    margin-top: 9px;
+    font-size: 11px;
+  }
+
+  .backup-card {
+    margin-top: 10px;
+    padding: 15px 14px;
+    gap: 12px;
+  }
+
+  .backup-card p {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+
+  .primary-action,
+  .secondary-button {
+    min-height: 38px;
+    padding: 0 14px;
+  }
+
+  .notes-workspace-tabs {
+    margin: 14px auto;
+  }
+
+  .time-milestone {
+    min-height: 128px;
+    padding: 12px;
+  }
+
+  .diary-layout {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 620px) {
+  .home-widget-grid.hero {
+    margin-bottom: 10px;
+    gap: 9px;
+  }
+
+  .daily-message-widget {
+    padding: 14px;
+  }
+
+  .daily-message-widget blockquote {
+    margin: 12px 0 11px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .clock-card.home-widget,
+  .experiment-card.home-widget {
+    min-height: 148px;
+    padding: 13px;
+  }
+
+  .clock-card.home-widget > strong {
+    margin-top: 10px;
+    font-size: clamp(30px, 8.6vw, 38px);
+  }
+
+  .experiment-card.home-widget .experiment-text {
+    margin: 10px 0 9px;
+  }
+
+  #homeView .member-card {
+    min-height: 122px;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  #homeView .shared-time {
+    padding: 14px;
+    gap: 13px;
+  }
+
+  #homeView .shared-time-heading h2 {
+    font-size: 22px;
+  }
+}

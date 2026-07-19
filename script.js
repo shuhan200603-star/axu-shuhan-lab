@@ -78,6 +78,7 @@ const dailyMessageHistoryList = document.querySelector("#dailyMessageHistoryList
 const notesWorkspaceTabs = [...document.querySelectorAll("[data-notes-target]")];
 const themeChoices = [...document.querySelectorAll("[data-theme-choice]")];
 const skinChoices = [...document.querySelectorAll("[data-skin-choice]")];
+const fontChoices = [...document.querySelectorAll("[data-font-choice]")];
 
 const notesKey = "axu-shuhan-lab-notes";
 const diariesKey = "axu-shuhan-lab-diaries";
@@ -450,6 +451,19 @@ function applySkin(skin) {
     if (state) state.textContent = isActive ? "正在使用" : "点此启用";
   });
   updateThemeColor();
+}
+
+const fontKey = "axu-shuhan-lab-font";
+const validFonts = new Set(["song", "kai", "hei"]);
+
+function applyFont(font) {
+  const nextFont = validFonts.has(font) ? font : "song";
+  document.documentElement.dataset.font = nextFont;
+  fontChoices.forEach((choice) => {
+    const isActive = choice.dataset.fontChoice === nextFont;
+    choice.classList.toggle("is-active", isActive);
+    choice.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function showView(target, updateLocation = true) {
@@ -1158,6 +1172,14 @@ skinChoices.forEach((choice) => {
   });
 });
 
+fontChoices.forEach((choice) => {
+  choice.addEventListener("click", () => {
+    const nextFont = choice.dataset.fontChoice;
+    localStorage.setItem(fontKey, nextFont);
+    applyFont(nextFont);
+  });
+});
+
 notesWorkspaceTabs.forEach((tab) => {
   tab.addEventListener("click", () => showView(tab.dataset.notesTarget));
 });
@@ -1416,9 +1438,11 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 const savedTheme = localStorage.getItem("axu-shuhan-lab-theme");
 const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "day";
 const savedSkin = localStorage.getItem(skinKey);
+const savedFont = localStorage.getItem(fontKey);
 diaryDate.value = localDateValue();
 memoryDate.value = shanghaiDateValue();
 applySkin(savedSkin || "ins");
+applyFont(savedFont || "song");
 applyTheme(savedTheme || preferredTheme);
 updateClock();
 renderNotes();
