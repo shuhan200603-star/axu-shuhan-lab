@@ -2268,7 +2268,7 @@ select:focus-visible,
 
   .memory-form-grid,
   .memory-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .memory-page.is-open {
@@ -3013,9 +3013,9 @@ select:focus-visible,
   }
 
   .nav-home-ring {
-    width: 58px;
-    height: 58px;
-    margin-top: -11px;
+    width: 56px;
+    height: 56px;
+    margin-top: -13px;
   }
 
   .chat-section {
@@ -3644,10 +3644,10 @@ select:focus-visible,
   transform: translateY(-2px);
 }
 
-/* 大 Home 圈：只从导航条上沿探出约 1/10，下面保留文字标签 */
+/* 大 Home 圈：只从导航条上沿探出约 1/10，文字标签留出间距不被压住 */
 .bottom-nav-home small {
   display: block;
-  margin-top: -3px;
+  margin-top: 3px;
 }
 
 .nav-home-ring {
@@ -3716,7 +3716,7 @@ select:focus-visible,
   }
 
   .settings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .settings-grid .backup-card {
@@ -3921,9 +3921,9 @@ select:focus-visible,
   }
 
   .nav-home-ring {
-    width: 58px;
-    height: 58px;
-    margin-top: -11px;
+    width: 56px;
+    height: 56px;
+    margin-top: -13px;
     border-width: 4px;
   }
 
@@ -4700,6 +4700,7 @@ select:focus-visible,
 }
 
 .key-input-row input {
+  width: 0;
   min-width: 0;
   padding: 9px 13px;
   color: var(--text);
@@ -4740,11 +4741,20 @@ select:focus-visible,
 }
 
 /* iOS 聚焦字号小于 16px 的输入框时会自动放大整页并停住，
-   造成界面看起来“错位/突出”。手机上统一提到 16px 以关掉该行为。 */
+   造成界面看起来“错位/突出”。手机上统一提到 16px 以关掉该行为。
+   同时兜底：任何表单控件都不许把父容器撑破（iOS 的输入框
+   在 flex/grid 里常常不肯收缩）。 */
 @media (max-width: 720px) {
   input,
   textarea,
   select {
+    max-width: 100%;
     font-size: 16px !important;
   }
+}
+
+.connection-list,
+.connection-list > div {
+  min-width: 0;
+  max-width: 100%;
 }
