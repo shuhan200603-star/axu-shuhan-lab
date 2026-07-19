@@ -77,6 +77,7 @@ const dailyMessageHistoryPanel = document.querySelector("#dailyMessageHistoryPan
 const dailyMessageHistoryList = document.querySelector("#dailyMessageHistoryList");
 const notesWorkspaceTabs = [...document.querySelectorAll("[data-notes-target]")];
 const themeChoices = [...document.querySelectorAll("[data-theme-choice]")];
+const skinChoices = [...document.querySelectorAll("[data-skin-choice]")];
 
 const notesKey = "axu-shuhan-lab-notes";
 const diariesKey = "axu-shuhan-lab-diaries";
@@ -406,18 +407,49 @@ function updateClock() {
   updateRelationshipTime();
 }
 
+const skinKey = "axu-shuhan-lab-skin";
+const validSkins = new Set(["ins", "vintage"]);
+
+const themeColors = {
+  ins: { day: "#f8f4f7", night: "#211c2a" },
+  vintage: { day: "#ece0c8", night: "#241d16" },
+};
+
+function currentSkin() {
+  return document.documentElement.dataset.skin || "ins";
+}
+
+function updateThemeColor() {
+  const isNight = document.documentElement.dataset.theme === "night";
+  const palette = themeColors[currentSkin()] || themeColors.ins;
+  themeColor.content = isNight ? palette.night : palette.day;
+}
+
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   const isNight = theme === "night";
   themeIcon.textContent = isNight ? "☀" : "☾";
   themeLabel.textContent = isNight ? "白天" : "夜晚";
   themeToggle.setAttribute("aria-label", `切换${isNight ? "白天" : "夜晚"}主题`);
-  themeColor.content = isNight ? "#211c2a" : "#f8f4f7";
+  updateThemeColor();
   themeChoices.forEach((choice) => {
     const isActive = choice.dataset.themeChoice === theme;
     choice.classList.toggle("is-active", isActive);
     choice.setAttribute("aria-pressed", String(isActive));
   });
+}
+
+function applySkin(skin) {
+  const nextSkin = validSkins.has(skin) ? skin : "ins";
+  document.documentElement.dataset.skin = nextSkin;
+  skinChoices.forEach((choice) => {
+    const isActive = choice.dataset.skinChoice === nextSkin;
+    choice.classList.toggle("is-active", isActive);
+    choice.setAttribute("aria-pressed", String(isActive));
+    const state = choice.querySelector("[data-skin-state]");
+    if (state) state.textContent = isActive ? "正在使用" : "点此启用";
+  });
+  updateThemeColor();
 }
 
 function showView(target, updateLocation = true) {
@@ -1118,6 +1150,14 @@ themeChoices.forEach((choice) => {
   });
 });
 
+skinChoices.forEach((choice) => {
+  choice.addEventListener("click", () => {
+    const nextSkin = choice.dataset.skinChoice;
+    localStorage.setItem(skinKey, nextSkin);
+    applySkin(nextSkin);
+  });
+});
+
 notesWorkspaceTabs.forEach((tab) => {
   tab.addEventListener("click", () => showView(tab.dataset.notesTarget));
 });
@@ -1375,8 +1415,10 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 
 const savedTheme = localStorage.getItem("axu-shuhan-lab-theme");
 const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "day";
+const savedSkin = localStorage.getItem(skinKey);
 diaryDate.value = localDateValue();
 memoryDate.value = shanghaiDateValue();
+applySkin(savedSkin || "ins");
 applyTheme(savedTheme || preferredTheme);
 updateClock();
 renderNotes();

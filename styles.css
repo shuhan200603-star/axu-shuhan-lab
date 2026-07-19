@@ -3939,3 +3939,127 @@ select:focus-visible,
     height: 17px;
   }
 }
+
+/* ===================================================================
+   复古风 · Vintage skin
+   一整套暖色旧纸调色板，覆盖 Ins 风的变量层。
+   通过 <html data-skin="vintage"> 启用，可与明暗主题自由组合。
+   =================================================================== */
+:root[data-skin="vintage"] {
+  color-scheme: light;
+  --bg: #ece0c8;
+  --surface: rgba(250, 242, 226, 0.74);
+  --surface-strong: rgba(250, 242, 226, 0.92);
+  --surface-solid: #f6eeda;
+  --text: #3f342a;
+  --muted: #8c7a63;
+  --line: rgba(94, 71, 46, 0.18);
+  --line-soft: rgba(94, 71, 46, 0.1);
+  --rose: #b45b3e;
+  --rose-soft: #ecd6c0;
+  --sage: #7d7a48;
+  --sage-soft: #dcd9b4;
+  --blue-soft: #e6dcc2;
+  --violet: #a2542f;
+  --violet-soft: #e7d4bd;
+  --shadow: 0 18px 44px rgba(88, 60, 34, 0.16), inset 0 1px 0 rgba(255, 250, 238, 0.7);
+  --font-en: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
+:root[data-skin="vintage"][data-theme="night"] {
+  color-scheme: dark;
+  --bg: #241d16;
+  --surface: rgba(53, 43, 32, 0.84);
+  --surface-strong: rgba(62, 50, 37, 0.95);
+  --surface-solid: #382d21;
+  --text: #f3e7d3;
+  --muted: #bda98d;
+  --line: rgba(240, 222, 194, 0.16);
+  --line-soft: rgba(240, 222, 194, 0.09);
+  --rose: #dc8f63;
+  --rose-soft: #4a3627;
+  --sage: #bcb277;
+  --sage-soft: #443c26;
+  --blue-soft: #362c1f;
+  --violet: #d99a5f;
+  --violet-soft: #443421;
+  --shadow: 0 22px 54px rgba(10, 6, 2, 0.4), inset 0 1px 0 rgba(255, 240, 214, 0.08);
+}
+
+/* 旧纸质感：暖色晕影 + 细颗粒噪点，固定在视口上 */
+:root[data-skin="vintage"] body {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(210, 168, 110, 0.28), transparent 42%),
+    radial-gradient(circle at 84% 88%, rgba(150, 110, 70, 0.24), transparent 46%),
+    var(--bg);
+}
+
+:root[data-skin="vintage"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:root[data-skin="vintage"][data-theme="night"] body::before {
+  opacity: 0.09;
+  mix-blend-mode: screen;
+}
+
+/* 纸不是玻璃：收敛毛玻璃模糊，让卡片更实、更暖 */
+:root[data-skin="vintage"] .panel,
+:root[data-skin="vintage"] .theme-toggle,
+:root[data-skin="vintage"] .search-button,
+:root[data-skin="vintage"] .note-form,
+:root[data-skin="vintage"] .diary-editor,
+:root[data-skin="vintage"] .diary-list-panel,
+:root[data-skin="vintage"] .backup-card,
+:root[data-skin="vintage"] .memory-editor,
+:root[data-skin="vintage"] .memory-calendar-panel,
+:root[data-skin="vintage"] .bottom-nav,
+:root[data-skin="vintage"] .import-dialog-card,
+:root[data-skin="vintage"] .search-dialog-card {
+  backdrop-filter: blur(6px) saturate(108%);
+  -webkit-backdrop-filter: blur(6px) saturate(108%);
+  background: var(--surface-strong);
+}
+
+/* 复古卡片：淡淡的旧纸描边与内衬 */
+:root[data-skin="vintage"] .panel {
+  border-color: rgba(120, 92, 60, 0.22);
+}
+
+/* 复古风格切换卡的样章配色 */
+:root[data-skin="vintage"] .style-swatch-vintage {
+  color: #fdf6e8;
+  background: linear-gradient(140deg, #c07a45, #9a4f2c);
+}
+
+:root[data-skin="vintage"] .style-swatch-ins {
+  background: #b4a488;
+}
+
+/* 伙伴头像跟着复古调色板走：序=暖锈色、函=橄榄色，明暗自动适配 */
+:root[data-skin="vintage"] .avatar-axu {
+  color: var(--rose);
+  background: var(--rose-soft);
+}
+
+:root[data-skin="vintage"] .avatar-shuhan {
+  color: var(--sage);
+  background: var(--sage-soft);
+}
+
+/* 高亮卡片的描边与光晕改成暖赭色，避免残留粉调 */
+:root[data-skin="vintage"] .time-milestone.is-active {
+  border-color: rgba(162, 84, 47, 0.34);
+  box-shadow: 0 16px 34px rgba(120, 72, 36, 0.16), inset 0 1px 0 rgba(255, 250, 238, 0.6);
+}
+
+:root[data-skin="vintage"] .daily-message-actions button.is-active {
+  border-color: rgba(162, 84, 47, 0.34);
+}
