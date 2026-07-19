@@ -4043,6 +4043,17 @@ select:focus-visible,
   background: #b4a488;
 }
 
+/* 伙伴头像跟着复古调色板走：序=暖锈色、函=橄榄色，明暗自动适配 */
+:root[data-skin="vintage"] .avatar-axu {
+  color: var(--rose);
+  background: var(--rose-soft);
+}
+
+:root[data-skin="vintage"] .avatar-shuhan {
+  color: var(--sage);
+  background: var(--sage-soft);
+}
+
 /* 高亮卡片的描边与光晕改成暖赭色，避免残留粉调 */
 :root[data-skin="vintage"] .time-milestone.is-active {
   border-color: rgba(162, 84, 47, 0.34);
