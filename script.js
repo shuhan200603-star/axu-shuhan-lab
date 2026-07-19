@@ -1490,9 +1490,12 @@ function saveChatHistory() {
 function chatBubble(role, content) {
   const bubble = document.createElement("div");
   bubble.className = `chat-msg chat-msg-${role}`;
-  const text = document.createElement("p");
-  text.textContent = content;
-  bubble.append(text);
+  // 模型喜欢用空行分段；按段落渲染，让气泡里的间距紧凑一些
+  content.split(/\n{2,}/).forEach((paragraph) => {
+    const text = document.createElement("p");
+    text.textContent = paragraph;
+    bubble.append(text);
+  });
   return bubble;
 }
 

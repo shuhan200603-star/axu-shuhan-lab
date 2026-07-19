@@ -4572,9 +4572,13 @@ select:focus-visible,
 .chat-msg p {
   margin: 0;
   font-size: 14px;
-  line-height: 1.75;
+  line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.chat-msg p + p {
+  margin-top: 7px;
 }
 
 .chat-msg-user {
