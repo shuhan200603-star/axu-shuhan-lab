@@ -349,23 +349,21 @@
         <div class="memory-list" id="memoryList" aria-live="polite"></div>
       </section>
 
-      <section class="chat-section panel app-view" id="chat" data-view="chat" hidden>
+      <section class="chat-section chat-live panel app-view" id="chat" data-view="chat" hidden>
         <div class="chat-intro">
           <p class="eyebrow"><span></span> A QUIET PLACE FOR US</p>
-          <h2>和 Sol 聊聊天</h2>
-          <p>这里先为未来的对话留一张干净书页。真正接入 GPT 时，会通过安全的服务端保管密钥，不会把它写进网页源码。</p>
+          <h2>夜话</h2>
+          <p class="chat-intro-note">阿序在这里陪你说话。以后 Sol 也可以从同一扇门进来。</p>
         </div>
-        <div class="chat-preview" aria-label="未来聊天功能预览">
-          <div class="chat-preview-orb" aria-hidden="true">S</div>
-          <p>等我们准备好安全的小信箱，Sol 就会在这里陪你说话。</p>
-          <span>COMING SOON · 暂未联网</span>
-        </div>
-        <div class="chat-composer" aria-disabled="true">
-          <span aria-hidden="true">＋</span>
-          <p>Future chat with Sol…</p>
-          <span class="chat-send-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg>
-          </span>
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
+        <form class="chat-composer-live" id="chatForm">
+          <textarea id="chatInput" rows="1" placeholder="跟阿序说点什么…" autocomplete="off"></textarea>
+          <button class="chat-send-button" id="chatSend" type="submit" aria-label="发送">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+          </button>
+        </form>
+        <div class="chat-tools">
+          <button id="chatClear" type="button">清空这一页</button>
         </div>
       </section>
 
@@ -452,10 +450,19 @@
               <span aria-hidden="true">∞</span>
             </div>
             <div class="connection-list">
-              <div><span>GPT Chat</span><small>安全服务端接入 · 规划中</small><b>›</b></div>
+              <div class="connection-key">
+                <span>OpenRouter</span>
+                <small>夜话的钥匙 · 只存在这台设备里</small>
+                <div class="key-input-row">
+                  <input id="openrouterKey" type="password" placeholder="sk-or-…" autocomplete="off" spellcheck="false" />
+                  <button id="saveKey" type="button">保存</button>
+                  <button id="clearKey" type="button" hidden>清除</button>
+                </div>
+                <small class="key-status" id="keyStatus" role="status" aria-live="polite"></small>
+              </div>
               <div><span>MCP</span><small>给小房子增加新能力 · 想法中</small><b>›</b></div>
             </div>
-            <p class="settings-safety-note">这里不会保存或展示任何 API Key。</p>
+            <p class="settings-safety-note">钥匙只存在这台设备的浏览器里，只在聊天时发给 OpenRouter，不会上传到任何别的地方。</p>
           </section>
 
           <section class="backup-card settings-card" aria-labelledby="backupTitle">
