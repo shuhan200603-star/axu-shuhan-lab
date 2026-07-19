@@ -1,4 +1,4 @@
-const CACHE_NAME = "axu-shuhan-lab-v8";
+const CACHE_NAME = "axu-shuhan-lab-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const APP_SHELL = [
   "./script.js",
   "./manifest.webmanifest",
   "./fonts/noto-serif-sc.css",
+  "./fonts/lxgw-wenkai.css",
   "./icons/lab-icon.svg",
   "./icons/lab-icon-192.png",
   "./icons/lab-icon-512.png",
