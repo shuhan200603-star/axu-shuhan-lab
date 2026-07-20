@@ -81,6 +81,9 @@ const skinChoices = [...document.querySelectorAll("[data-skin-choice]")];
 const fontChoices = [...document.querySelectorAll("[data-font-choice]")];
 
 const chatLog = document.querySelector("#chatLog");
+const chatNew = document.querySelector("#chatNew");
+const chatSessionsToggle = document.querySelector("#chatSessionsToggle");
+const chatSessionList = document.querySelector("#chatSessionList");
 const chatForm = document.querySelector("#chatForm");
 const chatInput = document.querySelector("#chatInput");
 const chatSend = document.querySelector("#chatSend");
@@ -1039,7 +1042,7 @@ function validateBackup(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     throw new Error("文件内容不是有效的备份对象。 ");
   }
-  if (data.app !== backupAppId || ![1, 2].includes(data.version)) {
+  if (data.app !== backupAppId || ![1, 2, 3].includes(data.version)) {
     throw new Error("这不是当前实验室支持的备份版本。 ");
   }
   if (!Array.isArray(data.notes) || !Array.isArray(data.diaries)) {
@@ -1114,7 +1117,25 @@ function validateBackup(data) {
     };
   });
 
-  return { version: data.version, notes: cleanNotes, diaries: cleanDiaries, memories: cleanMemories };
+  const validRoles = new Set(["user", "ai", "error"]);
+  const cleanChatSessions = (Array.isArray(data.chatSessions) ? data.chatSessions : [])
+    .map((session) => {
+      if (!session || typeof session !== "object" || typeof session.id !== "string" || !session.id.trim()) return null;
+      const messages = (Array.isArray(session.messages) ? session.messages : [])
+        .filter((entry) => entry && validRoles.has(entry.role) && typeof entry.content === "string")
+        .map((entry) => ({ role: entry.role, content: entry.content, t: Number(entry.t) || 0 }));
+      const createdAt = Number(session.createdAt) || Date.now();
+      return {
+        id: session.id,
+        title: typeof session.title === "string" && session.title.trim() ? session.title.trim().slice(0, 30) : "新的一页",
+        messages,
+        createdAt,
+        updatedAt: Number(session.updatedAt) || createdAt,
+      };
+    })
+    .filter(Boolean);
+
+  return { version: data.version, notes: cleanNotes, diaries: cleanDiaries, memories: cleanMemories, chatSessions: cleanChatSessions };
 }
 
 function closeImportDialog() {
@@ -1126,7 +1147,7 @@ function closeImportDialog() {
 
 function openImportDialog(data) {
   pendingImport = data;
-  importSummary.textContent = `已读取 v${data.version} 备份：${data.notes.length} 张便签、${data.diaries.length} 篇日记、${data.memories.length} 页记忆。请选择合并或覆盖；取消不会修改任何内容。`;
+  importSummary.textContent = `已读取 v${data.version} 备份：${data.notes.length} 张便签、${data.diaries.length} 篇日记、${data.memories.length} 页记忆、${data.chatSessions.length} 段夜话。请选择合并或覆盖；取消不会修改任何内容。`;
   importDialog.hidden = false;
   mergeImport.focus();
 }
@@ -1142,6 +1163,10 @@ function applyImportedData(mode) {
     notes = pendingImport.notes;
     diaries = pendingImport.diaries;
     memories = pendingImport.memories;
+    if (pendingImport.chatSessions.length) {
+      chatSessions = pendingImport.chatSessions;
+      activeChatId = "";
+    }
   } else {
     const existingNoteIds = new Set(notes.map((note) => String(note.id)));
     const newNotes = pendingImport.notes.filter((note) => !existingNoteIds.has(String(note.id)));
@@ -1157,21 +1182,28 @@ function applyImportedData(mode) {
     notes = [...notes, ...newNotes];
     diaries = [...diaries, ...newDiaries];
     memories = [...memories, ...newMemories];
+    const existingChatIds = new Set(chatSessions.map((session) => session.id));
+    chatSessions = [...chatSessions, ...pendingImport.chatSessions.filter((session) => !existingChatIds.has(session.id))];
   }
 
   saveNotes();
   saveDiaries();
   saveMemories();
+  saveChatSessions();
   renderNotes();
   loadDiaryForDate();
   renderMemories();
   renderMemoryCalendar();
+  if (chatLog) {
+    renderChat();
+    renderChatSessions();
+  }
   const action = mode === "overwrite" ? "覆盖" : "合并";
   const noteTotal = notes.length;
   const diaryTotal = diaries.length;
   const memoryTotal = memories.length;
   closeImportDialog();
-  setBackupStatus(`${action}完成：现在共有 ${noteTotal} 张便签、${diaryTotal} 篇日记、${memoryTotal} 页记忆。`);
+  setBackupStatus(`${action}完成：现在共有 ${noteTotal} 张便签、${diaryTotal} 篇日记、${memoryTotal} 页记忆、${chatSessions.length} 段夜话。`);
 }
 
 themeToggle.addEventListener("click", () => {
@@ -1377,11 +1409,12 @@ deleteDiary.addEventListener("click", () => {
 exportData.addEventListener("click", () => {
   const backup = {
     app: backupAppId,
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
     notes,
     diaries,
     memories,
+    chatSessions,
   };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -1392,7 +1425,7 @@ exportData.addEventListener("click", () => {
   link.click();
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  setBackupStatus(`已导出 v2 备份：${notes.length} 张便签、${diaries.length} 篇日记、${memories.length} 页记忆。`);
+  setBackupStatus(`已导出 v3 备份：${notes.length} 张便签、${diaries.length} 篇日记、${memories.length} 页记忆、${chatSessions.length} 段夜话。`);
 });
 
 chooseImport.addEventListener("click", () => importFile.click());
@@ -1479,12 +1512,73 @@ const chatSystemPrompt = [
   "以后可能还有别的伙伴（比如 Sol）会来这里，但今晚是你在陪书函。",
 ].join("\n");
 
-let chatHistory = readStoredArray(chatHistoryKey);
+const chatSessionsKey = "axu-shuhan-lab-chat-sessions";
+const chatActiveKey = "axu-shuhan-lab-chat-active";
+const chatSessionLimit = 40;
+const chatDefaultTitle = "新的一页";
+
+let chatSessions = readStoredArray(chatSessionsKey);
 let chatPending = false;
 
-function saveChatHistory() {
-  if (chatHistory.length > chatHistoryLimit) chatHistory = chatHistory.slice(-chatHistoryLimit);
-  localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
+function chatTitleFrom(text) {
+  const title = String(text || "").trim().replace(/\s+/g, " ").slice(0, 14);
+  return title || chatDefaultTitle;
+}
+
+// 旧版单条聊天记录迁移成第一段会话，绝不丢历史
+const legacyChatHistory = readStoredArray(chatHistoryKey);
+if (legacyChatHistory.length && !chatSessions.length) {
+  const firstUser = legacyChatHistory.find((entry) => entry.role === "user");
+  chatSessions = [{
+    id: `chat-${Date.now()}`,
+    title: chatTitleFrom(firstUser && firstUser.content),
+    messages: legacyChatHistory,
+    createdAt: legacyChatHistory[0].t || Date.now(),
+    updatedAt: legacyChatHistory[legacyChatHistory.length - 1].t || Date.now(),
+  }];
+  localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
+  localStorage.removeItem(chatHistoryKey);
+}
+
+let activeChatId = localStorage.getItem(chatActiveKey) || "";
+
+function newChatSession() {
+  const session = {
+    id: `chat-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    title: chatDefaultTitle,
+    messages: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  chatSessions.push(session);
+  return session;
+}
+
+function activeChat() {
+  let session = chatSessions.find((entry) => entry.id === activeChatId);
+  if (!session && chatSessions.length) {
+    session = [...chatSessions].sort((a, b) => b.updatedAt - a.updatedAt)[0];
+  }
+  if (!session) session = newChatSession();
+  if (activeChatId !== session.id) {
+    activeChatId = session.id;
+    localStorage.setItem(chatActiveKey, session.id);
+  }
+  return session;
+}
+
+function saveChatSessions() {
+  chatSessions.forEach((session) => {
+    if (session.messages.length > chatHistoryLimit) session.messages = session.messages.slice(-chatHistoryLimit);
+  });
+  while (chatSessions.length > chatSessionLimit) {
+    const removable = [...chatSessions]
+      .filter((session) => session.id !== activeChatId)
+      .sort((a, b) => a.updatedAt - b.updatedAt)[0];
+    if (!removable) break;
+    chatSessions.splice(chatSessions.indexOf(removable), 1);
+  }
+  localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
 }
 
 function chatBubble(role, content) {
@@ -1500,22 +1594,72 @@ function chatBubble(role, content) {
 }
 
 function renderChat() {
+  const session = activeChat();
   chatLog.replaceChildren();
-  if (!chatHistory.length) {
+  if (!session.messages.length) {
     const empty = document.createElement("div");
     empty.className = "chat-empty";
     empty.textContent = "灯已经点好了。今晚想聊点什么？";
     chatLog.append(empty);
     return;
   }
-  chatHistory.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content)));
+  session.messages.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content)));
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
+function renderChatSessions() {
+  const sorted = [...chatSessions].sort((a, b) => b.updatedAt - a.updatedAt);
+  chatSessionList.replaceChildren();
+  sorted.forEach((session) => {
+    const row = document.createElement("div");
+    row.className = "chat-session-item";
+    if (session.id === activeChatId) row.classList.add("is-active");
+
+    const pick = document.createElement("button");
+    pick.type = "button";
+    pick.className = "chat-session-switch";
+    const name = document.createElement("strong");
+    name.textContent = session.title || chatDefaultTitle;
+    const meta = document.createElement("small");
+    const when = new Date(session.updatedAt || session.createdAt);
+    meta.textContent = `${session.messages.length} 句 · ${when.getMonth() + 1}月${when.getDate()}日`;
+    pick.append(name, meta);
+    pick.addEventListener("click", () => {
+      activeChatId = session.id;
+      localStorage.setItem(chatActiveKey, session.id);
+      renderChat();
+      renderChatSessions();
+      chatSessionList.hidden = true;
+      chatSessionsToggle.setAttribute("aria-expanded", "false");
+    });
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "chat-session-delete";
+    remove.setAttribute("aria-label", `删除「${session.title}」`);
+    remove.textContent = "✕";
+    remove.addEventListener("click", () => {
+      if (!confirm(`把「${session.title}」这一页撕掉吗？撕掉就找不回来了。`)) return;
+      chatSessions = chatSessions.filter((entry) => entry.id !== session.id);
+      if (activeChatId === session.id) activeChatId = "";
+      saveChatSessions();
+      renderChat();
+      renderChatSessions();
+    });
+
+    row.append(pick, remove);
+    chatSessionList.append(row);
+  });
+}
+
 function appendChat(role, content) {
-  chatHistory.push({ role, content, t: Date.now() });
-  saveChatHistory();
+  const session = activeChat();
+  session.messages.push({ role, content, t: Date.now() });
+  session.updatedAt = Date.now();
+  if (role === "user" && session.title === chatDefaultTitle) session.title = chatTitleFrom(content);
+  saveChatSessions();
   renderChat();
+  renderChatSessions();
 }
 
 function gentleChatError(status) {
@@ -1541,7 +1685,7 @@ async function sendChatMessage(text) {
   chatLog.scrollTop = chatLog.scrollHeight;
 
   try {
-    const context = chatHistory
+    const context = activeChat().messages
       .filter((entry) => entry.role === "user" || entry.role === "ai")
       .slice(-chatContextTurns)
       .map((entry) => ({ role: entry.role === "ai" ? "assistant" : "user", content: entry.content }));
@@ -1613,11 +1757,37 @@ if (chatForm) {
   });
 
   chatClear.addEventListener("click", () => {
-    if (!chatHistory.length) return;
+    const session = activeChat();
+    if (!session.messages.length) return;
     if (!confirm("把这一页夜话清空吗？清掉就找不回来了。")) return;
-    chatHistory = [];
-    saveChatHistory();
+    session.messages = [];
+    session.title = chatDefaultTitle;
+    session.updatedAt = Date.now();
+    saveChatSessions();
     renderChat();
+    renderChatSessions();
+  });
+
+  chatNew.addEventListener("click", () => {
+    const current = activeChat();
+    if (current.messages.length) {
+      const session = newChatSession();
+      activeChatId = session.id;
+      localStorage.setItem(chatActiveKey, session.id);
+      saveChatSessions();
+    }
+    renderChat();
+    renderChatSessions();
+    chatSessionList.hidden = true;
+    chatSessionsToggle.setAttribute("aria-expanded", "false");
+    chatInput.focus();
+  });
+
+  chatSessionsToggle.addEventListener("click", () => {
+    const open = chatSessionList.hidden;
+    chatSessionList.hidden = !open;
+    chatSessionsToggle.setAttribute("aria-expanded", String(open));
+    if (open) renderChatSessions();
   });
 
   saveKeyButton.addEventListener("click", () => {
