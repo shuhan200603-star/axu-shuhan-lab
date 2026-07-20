@@ -4544,6 +4544,86 @@ select:focus-visible,
   line-height: 1.7;
 }
 
+.chat-session-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-session-bar button {
+  min-height: 34px;
+  padding: 6px 13px;
+  cursor: pointer;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  font-size: 12px;
+}
+
+.chat-session-bar button[aria-expanded="true"] {
+  color: var(--rose);
+  background: var(--rose-soft);
+}
+
+.chat-session-list {
+  display: grid;
+  overflow-y: auto;
+  max-height: 216px;
+  padding: 2px;
+  gap: 6px;
+}
+
+.chat-session-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 8px 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-strong);
+  gap: 6px;
+}
+
+.chat-session-item.is-active {
+  border-color: var(--violet);
+  box-shadow: inset 0 0 0 1px var(--violet);
+}
+
+.chat-session-switch {
+  display: grid;
+  min-width: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  border: 0;
+  background: transparent;
+  flex: 1;
+  gap: 2px;
+}
+
+.chat-session-switch strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-session-switch small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.chat-session-delete {
+  padding: 6px 9px;
+  cursor: pointer;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
 .chat-log {
   display: flex;
   overflow-y: auto;

@@ -355,6 +355,11 @@
           <h2 id="chatTitle">Chat</h2>
           <p class="chat-intro-note">阿序在这里陪你说话。以后 Sol 也可以从同一扇门进来。</p>
         </div>
+        <div class="chat-session-bar">
+          <button id="chatNew" type="button">＋ 新对话</button>
+          <button id="chatSessionsToggle" type="button" aria-expanded="false" aria-controls="chatSessionList">往日会话</button>
+        </div>
+        <div class="chat-session-list" id="chatSessionList" hidden></div>
         <div class="chat-log" id="chatLog" aria-live="polite"></div>
         <form class="chat-composer-live" id="chatForm">
           <textarea id="chatInput" rows="1" placeholder="跟阿序说点什么…" autocomplete="off"></textarea>
