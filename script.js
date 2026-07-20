@@ -82,6 +82,12 @@ const fontChoices = [...document.querySelectorAll("[data-font-choice]")];
 
 const chatLog = document.querySelector("#chatLog");
 const chatNew = document.querySelector("#chatNew");
+const chatAttach = document.querySelector("#chatAttach");
+const chatImageInput = document.querySelector("#chatImageInput");
+const chatAttachPreview = document.querySelector("#chatAttachPreview");
+const chatAttachThumb = document.querySelector("#chatAttachThumb");
+const chatAttachRemove = document.querySelector("#chatAttachRemove");
+const onlineToggle = document.querySelector("#onlineToggle");
 const chatSessionsToggle = document.querySelector("#chatSessionsToggle");
 const chatSessionList = document.querySelector("#chatSessionList");
 const chatForm = document.querySelector("#chatForm");
@@ -1123,7 +1129,12 @@ function validateBackup(data) {
       if (!session || typeof session !== "object" || typeof session.id !== "string" || !session.id.trim()) return null;
       const messages = (Array.isArray(session.messages) ? session.messages : [])
         .filter((entry) => entry && validRoles.has(entry.role) && typeof entry.content === "string")
-        .map((entry) => ({ role: entry.role, content: entry.content, t: Number(entry.t) || 0 }));
+        .map((entry) => ({
+          role: entry.role,
+          content: entry.content,
+          t: Number(entry.t) || 0,
+          ...(typeof entry.image === "string" && entry.image.startsWith("data:image/") ? { image: entry.image } : {}),
+        }));
       const createdAt = Number(session.createdAt) || Date.now();
       return {
         id: session.id,
@@ -1578,19 +1589,68 @@ function saveChatSessions() {
     if (!removable) break;
     chatSessions.splice(chatSessions.indexOf(removable), 1);
   }
-  localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
+  try {
+    localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
+  } catch {
+    // 存储满了：从最旧的会话开始丢弃图片，再不行就整段丢弃
+    const byAge = [...chatSessions].sort((a, b) => a.updatedAt - b.updatedAt);
+    for (const session of byAge) {
+      session.messages.forEach((entry) => delete entry.image);
+      try {
+        localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
+        return;
+      } catch {
+        continue;
+      }
+    }
+  }
 }
 
-function chatBubble(role, content) {
+function chatBubble(role, content, image) {
   const bubble = document.createElement("div");
   bubble.className = `chat-msg chat-msg-${role}`;
+  if (image) {
+    const picture = document.createElement("img");
+    picture.className = "chat-msg-image";
+    picture.src = image;
+    picture.alt = "发送的图片";
+    bubble.append(picture);
+  }
   // 模型喜欢用空行分段；按段落渲染，让气泡里的间距紧凑一些
-  content.split(/\n{2,}/).forEach((paragraph) => {
+  String(content || "").split(/\n{2,}/).forEach((paragraph) => {
+    if (!paragraph && image) return;
     const text = document.createElement("p");
     text.textContent = paragraph;
     bubble.append(text);
   });
   return bubble;
+}
+
+// 图片压缩：最长边 1024、JPEG 0.75；还太大就再压一档，避免撑爆本机存储
+function compressChatImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read"));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error("decode"));
+      image.onload = () => {
+        const draw = (maxSide, quality) => {
+          const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(image.width * scale));
+          canvas.height = Math.max(1, Math.round(image.height * scale));
+          canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+          return canvas.toDataURL("image/jpeg", quality);
+        };
+        let output = draw(1024, 0.75);
+        if (output.length > 400000) output = draw(800, 0.6);
+        resolve(output);
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function renderChat() {
@@ -1603,7 +1663,7 @@ function renderChat() {
     chatLog.append(empty);
     return;
   }
-  session.messages.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content)));
+  session.messages.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content, entry.image)));
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
@@ -1652,11 +1712,11 @@ function renderChatSessions() {
   });
 }
 
-function appendChat(role, content) {
+function appendChat(role, content, image) {
   const session = activeChat();
-  session.messages.push({ role, content, t: Date.now() });
+  session.messages.push({ role, content, t: Date.now(), ...(image ? { image } : {}) });
   session.updatedAt = Date.now();
-  if (role === "user" && session.title === chatDefaultTitle) session.title = chatTitleFrom(content);
+  if (role === "user" && session.title === chatDefaultTitle) session.title = chatTitleFrom(content || "一张图片");
   saveChatSessions();
   renderChat();
   renderChatSessions();
@@ -1669,14 +1729,17 @@ function gentleChatError(status) {
   return "路上好像起雾了，消息没送到。检查一下网络，再试一次看看。";
 }
 
-async function sendChatMessage(text) {
+const chatOnlineKey = "axu-shuhan-lab-chat-online";
+const chatImageContextWindow = 8;
+
+async function sendChatMessage(text, image) {
   const key = localStorage.getItem(openrouterKeyName);
   if (!key) {
     appendChat("error", "还没有放钥匙进来——去「陈设 → 未来连接」存一把 OpenRouter Key，我们就能说话了。");
     return;
   }
 
-  appendChat("user", text);
+  appendChat("user", text, image);
   chatPending = true;
   chatSend.disabled = true;
   const typing = chatBubble("ai", "阿序落笔中…");
@@ -1685,11 +1748,25 @@ async function sendChatMessage(text) {
   chatLog.scrollTop = chatLog.scrollHeight;
 
   try {
-    const context = activeChat().messages
+    const recent = activeChat().messages
       .filter((entry) => entry.role === "user" || entry.role === "ai")
-      .slice(-chatContextTurns)
-      .map((entry) => ({ role: entry.role === "ai" ? "assistant" : "user", content: entry.content }));
+      .slice(-chatContextTurns);
+    const context = recent.map((entry, index) => {
+      const role = entry.role === "ai" ? "assistant" : "user";
+      // 只把最近几张图原样发过去，久远的图退化成文字提示，请求不至于太重
+      if (entry.image && index >= recent.length - chatImageContextWindow) {
+        return {
+          role,
+          content: [
+            { type: "text", text: entry.content || "（发来一张图片，看看吧）" },
+            { type: "image_url", image_url: { url: entry.image } },
+          ],
+        };
+      }
+      return { role, content: entry.image ? `${entry.content}（这句话附了一张图片）` : entry.content };
+    });
 
+    const online = localStorage.getItem(chatOnlineKey) === "1";
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -1699,7 +1776,7 @@ async function sendChatMessage(text) {
         "X-Title": "axu-shuhan-lab",
       },
       body: JSON.stringify({
-        model: chatModel,
+        model: online ? `${chatModel}:online` : chatModel,
         messages: [{ role: "system", content: chatSystemPrompt }, ...context],
       }),
     });
@@ -1734,15 +1811,50 @@ function refreshKeyStatus() {
   }
 }
 
+let pendingChatImage = "";
+
+function clearChatAttachment() {
+  pendingChatImage = "";
+  chatImageInput.value = "";
+  chatAttachPreview.hidden = true;
+  chatAttachThumb.removeAttribute("src");
+}
+
 if (chatForm) {
   chatForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const text = chatInput.value.trim();
-    if (!text || chatPending) return;
+    if ((!text && !pendingChatImage) || chatPending) return;
+    const image = pendingChatImage;
     chatInput.value = "";
     chatInput.style.height = "auto";
-    sendChatMessage(text);
+    clearChatAttachment();
+    sendChatMessage(text, image);
   });
+
+  chatAttach.addEventListener("click", () => chatImageInput.click());
+
+  chatImageInput.addEventListener("change", async () => {
+    const [file] = chatImageInput.files;
+    if (!file) return;
+    try {
+      pendingChatImage = await compressChatImage(file);
+      chatAttachThumb.src = pendingChatImage;
+      chatAttachPreview.hidden = false;
+    } catch {
+      clearChatAttachment();
+      appendChat("error", "这张图片打不开，换一张试试？");
+    }
+  });
+
+  chatAttachRemove.addEventListener("click", clearChatAttachment);
+
+  onlineToggle.addEventListener("click", () => {
+    const next = localStorage.getItem(chatOnlineKey) === "1" ? "0" : "1";
+    localStorage.setItem(chatOnlineKey, next);
+    onlineToggle.setAttribute("aria-checked", next === "1" ? "true" : "false");
+  });
+  onlineToggle.setAttribute("aria-checked", localStorage.getItem(chatOnlineKey) === "1" ? "true" : "false");
 
   chatInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
