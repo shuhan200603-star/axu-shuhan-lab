@@ -361,7 +361,15 @@
         </div>
         <div class="chat-session-list" id="chatSessionList" hidden></div>
         <div class="chat-log" id="chatLog" aria-live="polite"></div>
+        <div class="chat-attach-preview" id="chatAttachPreview" hidden>
+          <img id="chatAttachThumb" alt="待发送的图片" />
+          <button id="chatAttachRemove" type="button" aria-label="取消这张图片">✕</button>
+        </div>
         <form class="chat-composer-live" id="chatForm">
+          <button class="chat-attach-button" id="chatAttach" type="button" aria-label="发一张图片">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+          <input id="chatImageInput" type="file" accept="image/*" hidden />
           <textarea id="chatInput" rows="1" placeholder="跟阿序说点什么…" autocomplete="off"></textarea>
           <button class="chat-send-button" id="chatSend" type="submit" aria-label="发送">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
@@ -463,6 +471,11 @@
                   <button id="clearKey" type="button" hidden>清除</button>
                 </div>
                 <small class="key-status" id="keyStatus" role="status" aria-live="polite"></small>
+              </div>
+              <div class="connection-toggle">
+                <span>联网搜索</span>
+                <small>开着的话，阿序聊天时可以去外面查一查</small>
+                <button id="onlineToggle" type="button" role="switch" aria-checked="false"><span></span></button>
               </div>
               <div><span>MCP</span><small>给小房子增加新能力 · 想法中</small><b>›</b></div>
             </div>
