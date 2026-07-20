@@ -88,6 +88,10 @@ const chatAttachPreview = document.querySelector("#chatAttachPreview");
 const chatAttachThumb = document.querySelector("#chatAttachThumb");
 const chatAttachRemove = document.querySelector("#chatAttachRemove");
 const onlineToggle = document.querySelector("#onlineToggle");
+const chatMic = document.querySelector("#chatMic");
+const chatRecording = document.querySelector("#chatRecording");
+const chatRecTimer = document.querySelector("#chatRecTimer");
+const chatRecCancel = document.querySelector("#chatRecCancel");
 const chatSessionsToggle = document.querySelector("#chatSessionsToggle");
 const chatSessionList = document.querySelector("#chatSessionList");
 const chatForm = document.querySelector("#chatForm");
@@ -1134,6 +1138,7 @@ function validateBackup(data) {
           content: entry.content,
           t: Number(entry.t) || 0,
           ...(typeof entry.image === "string" && entry.image.startsWith("data:image/") ? { image: entry.image } : {}),
+          ...(typeof entry.audio === "string" && entry.audio.startsWith("data:audio/") ? { audio: entry.audio, dur: Number(entry.dur) || 1 } : {}),
         }));
       const createdAt = Number(session.createdAt) || Date.now();
       return {
@@ -1592,10 +1597,13 @@ function saveChatSessions() {
   try {
     localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
   } catch {
-    // 存储满了：从最旧的会话开始丢弃图片，再不行就整段丢弃
+    // 存储满了：从最旧的会话开始丢弃图片和语音，再不行就整段丢弃
     const byAge = [...chatSessions].sort((a, b) => a.updatedAt - b.updatedAt);
     for (const session of byAge) {
-      session.messages.forEach((entry) => delete entry.image);
+      session.messages.forEach((entry) => {
+        delete entry.image;
+        delete entry.audio;
+      });
       try {
         localStorage.setItem(chatSessionsKey, JSON.stringify(chatSessions));
         return;
@@ -1606,19 +1614,55 @@ function saveChatSessions() {
   }
 }
 
-function chatBubble(role, content, image) {
+function chatBubble(role, content, extras = {}) {
   const bubble = document.createElement("div");
   bubble.className = `chat-msg chat-msg-${role}`;
-  if (image) {
+  if (extras.image) {
     const picture = document.createElement("img");
     picture.className = "chat-msg-image";
-    picture.src = image;
+    picture.src = extras.image;
     picture.alt = "发送的图片";
     bubble.append(picture);
   }
+  if (extras.audio) {
+    const player = document.createElement("button");
+    player.type = "button";
+    player.className = "chat-voice";
+    const icon = document.createElement("span");
+    icon.className = "chat-voice-icon";
+    icon.textContent = "▶";
+    const bars = document.createElement("span");
+    bars.className = "chat-voice-bars";
+    bars.append(...[0, 1, 2].map(() => document.createElement("i")));
+    const time = document.createElement("span");
+    time.className = "chat-voice-dur";
+    time.textContent = `${extras.dur || 1}″`;
+    player.append(icon, bars, time);
+    let audioEl = null;
+    player.addEventListener("click", () => {
+      if (!audioEl) {
+        audioEl = new Audio(extras.audio);
+        audioEl.addEventListener("ended", () => {
+          icon.textContent = "▶";
+          player.classList.remove("is-playing");
+        });
+      }
+      if (audioEl.paused) {
+        audioEl.play();
+        icon.textContent = "❚❚";
+        player.classList.add("is-playing");
+      } else {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        icon.textContent = "▶";
+        player.classList.remove("is-playing");
+      }
+    });
+    bubble.append(player);
+  }
   // 模型喜欢用空行分段；按段落渲染，让气泡里的间距紧凑一些
   String(content || "").split(/\n{2,}/).forEach((paragraph) => {
-    if (!paragraph && image) return;
+    if (!paragraph && (extras.image || extras.audio)) return;
     const text = document.createElement("p");
     text.textContent = paragraph;
     bubble.append(text);
@@ -1663,7 +1707,7 @@ function renderChat() {
     chatLog.append(empty);
     return;
   }
-  session.messages.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content, entry.image)));
+  session.messages.forEach((entry) => chatLog.append(chatBubble(entry.role, entry.content, entry)));
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
@@ -1712,11 +1756,19 @@ function renderChatSessions() {
   });
 }
 
-function appendChat(role, content, image) {
+function appendChat(role, content, image, voice) {
   const session = activeChat();
-  session.messages.push({ role, content, t: Date.now(), ...(image ? { image } : {}) });
+  session.messages.push({
+    role,
+    content,
+    t: Date.now(),
+    ...(image ? { image } : {}),
+    ...(voice ? { audio: voice.audio, dur: voice.dur } : {}),
+  });
   session.updatedAt = Date.now();
-  if (role === "user" && session.title === chatDefaultTitle) session.title = chatTitleFrom(content || "一张图片");
+  if (role === "user" && session.title === chatDefaultTitle) {
+    session.title = chatTitleFrom(content || (voice ? "一段语音" : "一张图片"));
+  }
   saveChatSessions();
   renderChat();
   renderChatSessions();
@@ -1732,14 +1784,14 @@ function gentleChatError(status) {
 const chatOnlineKey = "axu-shuhan-lab-chat-online";
 const chatImageContextWindow = 8;
 
-async function sendChatMessage(text, image) {
+async function sendChatMessage(text, image, voice) {
   const key = localStorage.getItem(openrouterKeyName);
   if (!key) {
     appendChat("error", "还没有放钥匙进来——去「陈设 → 未来连接」存一把 OpenRouter Key，我们就能说话了。");
     return;
   }
 
-  appendChat("user", text, image);
+  appendChat("user", text, image, voice);
   chatPending = true;
   chatSend.disabled = true;
   const typing = chatBubble("ai", "阿序落笔中…");
@@ -1855,6 +1907,184 @@ if (chatForm) {
     onlineToggle.setAttribute("aria-checked", next === "1" ? "true" : "false");
   });
   onlineToggle.setAttribute("aria-checked", localStorage.getItem(chatOnlineKey) === "1" ? "true" : "false");
+
+  /* ---------- 语音消息：录音 → 语音气泡 → 转文字 → 交给阿序 ---------- */
+  const chatTranscribeModel = "google/gemini-2.5-flash";
+  let recorder = null;
+  let recChunks = [];
+  let recStream = null;
+  let recStart = 0;
+  let recTimerId = 0;
+  let recCancelled = false;
+
+  function blobToDataURL(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("read"));
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  // 转成 16kHz 单声道 WAV，喂给转写模型（播放仍用压缩的原始录音）
+  async function blobToWavBase64(blob) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const probe = new AudioContextClass();
+    const decoded = await probe.decodeAudioData(await blob.arrayBuffer());
+    probe.close();
+    const rate = 16000;
+    const length = Math.min(Math.ceil(decoded.duration * rate), rate * 60);
+    const offline = new OfflineAudioContext(1, length, rate);
+    const source = offline.createBufferSource();
+    source.buffer = decoded;
+    source.connect(offline.destination);
+    source.start();
+    const rendered = await offline.startRendering();
+    const pcm = rendered.getChannelData(0);
+    const view = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+    const writeString = (offset, value) => [...value].forEach((ch, i) => view.setUint8(offset + i, ch.charCodeAt(0)));
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + pcm.length * 2, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, rate, true);
+    view.setUint32(28, rate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, "data");
+    view.setUint32(40, pcm.length * 2, true);
+    for (let i = 0; i < pcm.length; i += 1) {
+      const sample = Math.max(-1, Math.min(1, pcm[i]));
+      view.setInt16(44 + i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+    }
+    const bytes = new Uint8Array(view.buffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    }
+    return btoa(binary);
+  }
+
+  async function transcribeVoice(blob, key) {
+    const wav = await blobToWavBase64(blob);
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+        "HTTP-Referer": location.origin,
+        "X-Title": "axu-shuhan-lab",
+      },
+      body: JSON.stringify({
+        model: chatTranscribeModel,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "请把这段中文语音逐字转写成文字。只输出转写内容本身，不要任何解释、前缀或标点之外的标注。" },
+            { type: "input_audio", input_audio: { data: wav, format: "wav" } },
+          ],
+        }],
+      }),
+    });
+    if (!response.ok) throw new Error(String(response.status));
+    const data = await response.json();
+    return (data?.choices?.[0]?.message?.content || "").trim();
+  }
+
+  function cleanupRecording() {
+    clearInterval(recTimerId);
+    chatForm.classList.remove("is-recording");
+    chatMic.classList.remove("is-live");
+    if (recStream) recStream.getTracks().forEach((track) => track.stop());
+    recStream = null;
+    recorder = null;
+  }
+
+  async function onRecordingStop() {
+    const dur = Math.max(1, Math.round((Date.now() - recStart) / 1000));
+    const chunks = recChunks;
+    const cancelled = recCancelled;
+    cleanupRecording();
+    if (cancelled || !chunks.length) return;
+    const blob = new Blob(chunks, { type: chunks[0].type || "audio/mp4" });
+    if (blob.size < 1500) {
+      appendChat("error", "这段语音太短啦，再说一次？");
+      return;
+    }
+
+    const key = localStorage.getItem(openrouterKeyName);
+    if (!key) {
+      appendChat("error", "还没有放钥匙进来——去「陈设 → 未来连接」存一把 OpenRouter Key，我们就能说话了。");
+      return;
+    }
+
+    const audioUrl = await blobToDataURL(blob);
+    chatPending = true;
+    chatSend.disabled = true;
+    const listening = chatBubble("ai", "阿序在听…");
+    listening.classList.add("is-typing");
+    chatLog.append(listening);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+    let transcript = "";
+    try {
+      transcript = await transcribeVoice(blob, key);
+    } catch {
+      transcript = "";
+    }
+    listening.remove();
+    chatPending = false;
+    chatSend.disabled = false;
+
+    if (!transcript) {
+      appendChat("user", "（一段语音）", "", { audio: audioUrl, dur });
+      appendChat("error", "这段语音没听清，文字没转出来——语音本身已经存好，可以点开重听。");
+      return;
+    }
+    sendChatMessage(transcript, "", { audio: audioUrl, dur });
+  }
+
+  function startRecording() {
+    if (chatPending || !navigator.mediaDevices) return;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      recStream = stream;
+      recChunks = [];
+      recCancelled = false;
+      const preferred = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"].find((type) => MediaRecorder.isTypeSupported(type));
+      recorder = new MediaRecorder(stream, { ...(preferred ? { mimeType: preferred } : {}), audioBitsPerSecond: 32000 });
+      recorder.addEventListener("dataavailable", (event) => {
+        if (event.data.size) recChunks.push(event.data);
+      });
+      recorder.addEventListener("stop", onRecordingStop);
+      recorder.start();
+      recStart = Date.now();
+      chatForm.classList.add("is-recording");
+      chatMic.classList.add("is-live");
+      chatRecTimer.textContent = "0″";
+      recTimerId = setInterval(() => {
+        const seconds = Math.round((Date.now() - recStart) / 1000);
+        chatRecTimer.textContent = `${seconds}″`;
+        if (seconds >= 60 && recorder && recorder.state === "recording") recorder.stop();
+      }, 250);
+    }).catch(() => {
+      appendChat("error", "小房子拿不到麦克风——去系统设置里允许 Safari 使用麦克风，再回来试试。");
+    });
+  }
+
+  chatMic.addEventListener("click", () => {
+    if (recorder && recorder.state === "recording") recorder.stop();
+    else startRecording();
+  });
+
+  chatRecCancel.addEventListener("click", () => {
+    recCancelled = true;
+    if (recorder && recorder.state === "recording") recorder.stop();
+  });
+
+  if (!window.MediaRecorder || !navigator.mediaDevices) chatMic.hidden = true;
 
   chatInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
